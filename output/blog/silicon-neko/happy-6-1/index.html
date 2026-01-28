@@ -1,0 +1,223 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+<title>硅基猫儿童节快乐！</title>
+<meta charset="utf-8">
+<script data-goatcounter="https://blog.mistivia.com:8081/count"
+        async src="https://blog.mistivia.com:8081/count.js"></script>
+<style>
+body {
+  margin: 0;
+}
+
+#balloon-container {
+  height: 100vh;
+  padding: 1em;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+}
+
+.balloon {
+  height: 125px;
+  width: 105px;
+  border-radius: 75% 75% 70% 70%;
+  position: relative;
+}
+
+.balloon:before {
+  content: "";
+  height: 75px;
+  width: 1px;
+  padding: 1px;
+  background-color: #FDFD96;
+  display: block;
+  position: absolute;
+  top: 125px;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+.balloon:after {
+    content: "▲";
+    text-align: center;
+    display: block;
+    position: absolute;
+    color: inherit;
+    top: 120px;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+@keyframes float {
+  from {transform: translateY(100vh);
+  opacity: 1;}
+  to {transform: translateY(-300vh);
+  opacity: 0;}
+}
+
+.wrapper {
+  display: flex;
+  align-items: center;
+}
+.wrapper p {
+  font-size: 100px;
+  font-family: -apple-system,blinkmacsystemfont,'Helvetica Neue', 'Segoe UI',roboto,arial,'PingFang TC','Microsoft YaHei', 'Source Han Sans TC','Noto Sans CJK TC','WenQuanYi Micro Hei',sans-serif;
+  transform: scale(0.9, 1) rotatey(-10deg) translatey(0px);
+  animation: 2.2s scaling cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  text-shadow: 0 0 #e8332e, 0 0 #fc9e05, 0 0 #891696;
+  transform-origin: 50% 100%;
+  color: #fff;
+  position: relative;
+  top: 10%;
+  transform-style: preserve-3d;
+  margin-right: 4px;
+}
+.wrapper p:nth-child(1) {
+  animation-delay: 140ms;
+}
+.wrapper p:nth-child(2) {
+  animation-delay: 280ms;
+}
+.wrapper p:nth-child(3) {
+  animation-delay: 420ms;
+}
+.wrapper p:nth-child(4) {
+  animation-delay: 560ms;
+}
+.wrapper p:nth-child(5) {
+  animation-delay: 700ms;
+}
+.wrapper p:nth-child(6) {
+  animation-delay: 840ms;
+}
+.wrapper p:nth-child(7) {
+  animation-delay: 980ms;
+}
+.wrapper p:nth-child(8) {
+  animation-delay: 1120ms;
+}
+.wrapper p:nth-child(9) {
+  animation-delay: 1260ms;
+}
+.wrapper p:nth-child(10) {
+  animation-delay: 1400ms;
+}
+
+@keyframes scaling {
+  20% {
+    text-shadow: 0px 0 #e8332e, 0px 0 #fc9e05, 0px 0 #891696;
+    transform: scale(0.9, 1) rotatey(-10deg);
+  }
+  40% {
+    transform: scale(0.9, 2) translatey(16px);
+    text-shadow: -10px 0px #e8332e, -20px 0 #fc9e05, -30px 0 #891696;
+  }
+  60% {
+    transform: scale(0.9, 1) rotatey(-5deg);
+    text-shadow: 0px 0 #e8332e, 0px 0 #fc9e05, 0px 0 #891696;
+  }
+  80% {
+    transform: scale(0.9, 2) translatey(16px);
+    text-shadow: 10px 0px #e8332e, 20px 0 #fc9e05, 30px 0 #891696;
+  }
+}
+@keyframes jump {
+  20% {
+    transform: translatey(0) scale(0);
+    opacity: 0;
+  }
+  40% {
+    transform: translatey(-50px) scale(1);
+    opacity: 1;
+  }
+  60% {
+    transform: translatey(0) scale(0);
+    opacity: 0;
+  }
+  80% {
+    transform: translatey(-50px) scale(1);
+    opacity: 1;
+  }
+}
+html {
+  width: 100%;
+  height: 100vh;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #f69294;
+}
+</style>
+</head>
+
+<body>
+
+    <div id="balloon-container">
+        <div class="wrapper">
+            <p>硅</p>
+            <p>基</p>
+            <p>猫</p>
+            <p>儿</p>
+            <p>童</p>
+            <p>节</p>
+            <p>快</p>
+            <p>乐</p>
+            <p>!</p>
+        </div>
+    </div>
+
+
+
+<script>
+function random(num) {
+  return Math.floor(Math.random()*num)
+}
+
+function getRandomStyles() {
+  var r = random(255);
+  var g = random(255);
+  var b = random(255);
+  var mt = random(200);
+  var ml = random(50);
+  var dur = random(5)+5;
+  return `
+  background-color: rgba(${r},${g},${b},0.7);
+  color: rgba(${r},${g},${b},0.7); 
+  box-shadow: inset -7px -3px 10px rgba(${r-10},${g-10},${b-10},0.7);
+  margin: ${mt}px 0 0 ${ml}px;
+  animation: float ${dur}s ease-in infinite
+  `
+}
+
+function createBalloons(num) {
+    var balloonContainer = document.getElementById("balloon-container")
+    for (var i = num; i > 0; i--) {
+        var balloon = document.createElement("div");
+        balloon.className = "balloon";
+        balloon.style.cssText = getRandomStyles();
+        balloonContainer.append(balloon);
+    }
+}
+
+window.onload = function() {
+  createBalloons(100);
+}
+</script>
+
+</body>
+
+</html>

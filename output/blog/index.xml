@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Scriptum Mistiviae</title>
+    <link>https://blog.mistivia.com</link>
+    <description>Mistivia's Blog</description>
+    <language>zh</language>
+    <generator>Python Plain String RSS Generator</generator>
+
+    <item>
+      <title>西北之行</title>
+      <link>https://blog.mistivia.com/posts/2026-01-14-nwtravel/</link>
+      <description>Link to the post: https://blog.mistivia.com/posts/2026-01-14-nwtravel/</description>
+      <guid>https://blog.mistivia.com/posts/2026-01-14-nwtravel/</guid>
+      <pubDate>Wed, 14 Jan 2026 00:00:00 GMT</pubDate>
+    </item>
+
+    <item>
+      <title>专治各种游戏联机疑难杂症</title>
+      <link>https://blog.mistivia.com/posts/2026-01-12-full-cone-nat/</link>
+      <description>Link to the post: https://blog.mistivia.com/posts/2026-01-12-full-cone-nat/</description>
+      <guid>https://blog.mistivia.com/posts/2026-01-12-full-cone-nat/</guid>
+      <pubDate>Mon, 12 Jan 2026 00:00:00 GMT</pubDate>
+    </item>
+
+    <item>
+      <title>EZLive: 无需服务器，轻松搭建私人直播间</title>
+      <link>https://blog.mistivia.com/posts/2025-09-27-ezlive/</link>
+      <description>Link to the post: https://blog.mistivia.com/posts/2025-09-27-ezlive/</description>
+      <guid>https://blog.mistivia.com/posts/2025-09-27-ezlive/</guid>
+      <pubDate>Sat, 27 Sep 2025 00:00:00 GMT</pubDate>
+    </item>
+
+    <item>
+      <title>东京游记</title>
+      <link>https://blog.mistivia.com/posts/2025-07-17-tokyo/</link>
+      <description>Link to the post: https://blog.mistivia.com/posts/2025-07-17-tokyo/</description>
+      <guid>https://blog.mistivia.com/posts/2025-07-17-tokyo/</guid>
+      <pubDate>Thu, 17 Jul 2025 00:00:00 GMT</pubDate>
+    </item>
+
+    <item>
+      <title>如何使用新闻组</title>
+      <link>https://blog.mistivia.com/posts/2025-06-04-newsgroup/</link>
+      <description>Link to the post: https://blog.mistivia.com/posts/2025-06-04-newsgroup/</description>
+      <guid>https://blog.mistivia.com/posts/2025-06-04-newsgroup/</guid>
+      <pubDate>Wed, 04 Jun 2025 00:00:00 GMT</pubDate>
+    </item>
+
+    <item>
+      <title>像Rust一样使用Haskell</title>
+      <link>https://blog.mistivia.com/posts/2025-05-31-linear-haskell/</link>
+      <description>Link to the post: https://blog.mistivia.com/posts/2025-05-31-linear-haskell/</description>
+      <guid>https://blog.mistivia.com/posts/2025-05-31-linear-haskell/</guid>
+      <pubDate>Sat, 31 May 2025 00:00:00 GMT</pubDate>
+    </item>
+
+    <item>
+      <title>类型级编程：一个最平凡的例子</title>
+      <link>https://blog.mistivia.com/posts/2025-05-17-singleton-types/</link>
+      <description>Link to the post: https://blog.mistivia.com/posts/2025-05-17-singleton-types/</description>
+      <guid>https://blog.mistivia.com/posts/2025-05-17-singleton-types/</guid>
+      <pubDate>Sat, 17 May 2025 00:00:00 GMT</pubDate>
+    </item>
+
+    <item>
+      <title>如何制作出极小的超轻量Docker镜像</title>
+      <link>https://blog.mistivia.com/posts/2025-05-16-min-docker-image/</link>
+      <description>Link to the post: https://blog.mistivia.com/posts/2025-05-16-min-docker-image/</description>
+      <guid>https://blog.mistivia.com/posts/2025-05-16-min-docker-image/</guid>
+      <pubDate>Fri, 16 May 2025 00:00:00 GMT</pubDate>
+    </item>
+
+  </channel>
+</rss>
+

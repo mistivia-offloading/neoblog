@@ -1,0 +1,444 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WireGuard AllowedIPs Calculator (IPv4 + IPv6)</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #333;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background-color: #fff;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #333;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+
+        .code-tag {
+            background-color: #f0f0f0;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.95em;
+        }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            width: 150px;
+            text-align: right;
+            padding-right: 20px;
+            font-weight: 700;
+            color: #444;
+            flex-shrink: 0;
+        }
+
+        .form-input {
+            flex-grow: 1;
+            padding: 10px 15px;
+            font-size: 1rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background-color: #eef4ff;
+            color: #495057;
+            font-family: monospace;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+        }
+
+        #disallowed-ips {
+            border-color: #5bc0de;
+        }
+
+        .btn-container {
+            margin-left: 170px;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #8B1A1A;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #a31e1e;
+        }
+
+        #result-area {
+            margin-top: 30px;
+            margin-left: 170px;
+            display: none;
+        }
+
+        .result-box {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .error-msg {
+            color: #dc3545;
+            margin-left: 170px;
+            margin-top: 10px;
+            display: none;
+            font-weight: bold;
+        }
+        
+        .hint {
+            font-size: 0.85rem;
+            color: #888;
+            margin-left: 170px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>AllowedIPs Calculator <span style="font-size:0.6em; color:#666;">(v4 + v6)</span></h1>
+    
+    <p>
+        Calculate WireGuard <span class="code-tag">AllowedIPs</span> by subtracting "disallowed" subnets from "allowed" subnets. Supports both IPv4 and IPv6 CIDR.
+    </p>
+
+    <div class="form-group">
+        <label class="form-label">Allowed IPs</label>
+        <input type="text" id="allowed-ips" class="form-input" value="0.0.0.0/0, ::/0">
+    </div>
+    <div class="hint">Examples: 0.0.0.0/0, ::/0 (The entire internet)</div>
+
+    <div class="form-group">
+        <label class="form-label">Disallowed IPs</label>
+        <input type="text" id="disallowed-ips" class="form-input" value="192.168.0.0/16, 10.0.0.0/8, 2001:db8::/32">
+    </div>
+    <div class="hint">Local LANs or specific ranges to exclude.</div>
+
+    <div class="btn-container">
+        <button onclick="calculate()">Calculate</button>
+    </div>
+
+    <div id="error-msg" class="error-msg"></div>
+
+    <div id="result-area">
+        <h3>Result:</h3>
+        <div class="result-box" id="result-content"></div>
+    </div>
+
+    <script>
+        /**
+         * IP工具类：使用 BigInt 统一处理 IPv4 (32bit) 和 IPv6 (128bit)
+         */
+        const IpUtils = {
+            // 解析 CIDR 字符串，自动识别 v4 或 v6
+            parseCidr: function(cidrStr) {
+                cidrStr = cidrStr.trim();
+                const parts = cidrStr.split('/');
+                const ipStr = parts[0];
+                let prefix = parts.length > 1 ? parseInt(parts[1], 10) : null;
+                
+                if (ipStr.includes(':')) {
+                    // IPv6
+                    return this.parseV6(ipStr, prefix);
+                } else {
+                    // IPv4
+                    return this.parseV4(ipStr, prefix);
+                }
+            },
+
+            // 解析 IPv4
+            parseV4: function(ipStr, prefix) {
+                const parts = ipStr.split('.');
+                if (parts.length !== 4) throw new Error("Invalid IPv4: " + ipStr);
+                
+                let val = 0n;
+                for (let part of parts) {
+                    val = (val << 8n) | BigInt(parseInt(part, 10));
+                }
+                
+                if (prefix === null) prefix = 32;
+                if (prefix < 0 || prefix > 32) throw new Error("Invalid IPv4 prefix: " + prefix);
+
+                return this.createCidrObj(val, prefix, 32, 4);
+            },
+
+            // 解析 IPv6
+            parseV6: function(ipStr, prefix) {
+                // 展开 :: 
+                let fullHex = [];
+                if (ipStr.includes('::')) {
+                    const split = ipStr.split('::');
+                    const left = split[0] ? split[0].split(':') : [];
+                    const right = split[1] ? split[1].split(':') : [];
+                    const missing = 8 - (left.length + right.length);
+                    if (missing < 0) throw new Error("Invalid IPv6: " + ipStr);
+                    
+                    fullHex = [...left, ...Array(missing).fill('0'), ...right];
+                } else {
+                    fullHex = ipStr.split(':');
+                }
+
+                if (fullHex.length !== 8) throw new Error("Invalid IPv6: " + ipStr);
+
+                let val = 0n;
+                for (let hex of fullHex) {
+                    // 处理空字符串情况（如 :1:: 这种边界）
+                    if (hex === '') hex = '0';
+                    val = (val << 16n) | BigInt(parseInt(hex, 16));
+                }
+
+                if (prefix === null) prefix = 128;
+                if (prefix < 0 || prefix > 128) throw new Error("Invalid IPv6 prefix: " + prefix);
+
+                return this.createCidrObj(val, prefix, 128, 6);
+            },
+
+            // 构造通用 CIDR 对象
+            createCidrObj: function(ipVal, prefix, maxBits, version) {
+                const maxBitsBig = BigInt(maxBits);
+                const prefixBig = BigInt(prefix);
+                
+                // 计算 mask: 比如 /24, mask 就是前24位1，后8位0
+                // 算法: ~((1 << (max - prefix)) - 1)
+                const hostBits = maxBitsBig - prefixBig;
+                const mask = ~((1n << hostBits) - 1n);
+                
+                // 确保 mask 截断在 maxBits 范围内 (处理 BigInt 负数补码问题)
+                // 这里用一个全1的掩码来修正: (1 << 128) - 1
+                const totalMask = (1n << maxBitsBig) - 1n;
+                const finalMask = mask & totalMask;
+
+                const start = ipVal & finalMask;
+                const end = start + (1n << hostBits) - 1n;
+
+                return {
+                    start: start,
+                    end: end,
+                    prefix: prefix,
+                    maxBits: maxBits, // 32 或 128
+                    version: version  // 4 或 6
+                };
+            },
+
+            // 将 BigInt 转回 IP 字符串
+            formatCidr: function(cidrObj) {
+                if (cidrObj.version === 4) {
+                    return this.formatV4(cidrObj.start) + '/' + cidrObj.prefix;
+                } else {
+                    return this.formatV6(cidrObj.start) + '/' + cidrObj.prefix;
+                }
+            },
+
+            formatV4: function(val) {
+                let parts = [];
+                for (let i = 0; i < 4; i++) {
+                    parts.unshift(Number(val & 255n));
+                    val = val >> 8n;
+                }
+                return parts.join('.');
+            },
+
+            formatV6: function(val) {
+                // 转换为 hex 数组
+                let parts = [];
+                for (let i = 0; i < 8; i++) {
+                    parts.unshift((val & 0xFFFFn).toString(16));
+                    val = val >> 16n;
+                }
+                
+                // 简单的 :: 压缩算法 (查找最长的连续0序列)
+                let bestStart = -1, bestLen = 0;
+                let currentStart = -1, currentLen = 0;
+                
+                for (let i = 0; i < 8; i++) {
+                    if (parts[i] === '0') {
+                        if (currentStart === -1) currentStart = i;
+                        currentLen++;
+                    } else {
+                        if (currentLen > 1 && currentLen > bestLen) {
+                            bestLen = currentLen;
+                            bestStart = currentStart;
+                        }
+                        currentStart = -1;
+                        currentLen = 0;
+                    }
+                }
+                // Check end
+                if (currentLen > 1 && currentLen > bestLen) {
+                    bestLen = currentLen;
+                    bestStart = currentStart;
+                }
+
+                if (bestLen > 0) {
+                    // 执行压缩
+                    let before = parts.slice(0, bestStart).join(':');
+                    let after = parts.slice(bestStart + bestLen).join(':');
+                    return (before + '::' + after);
+                }
+
+                return parts.join(':');
+            }
+        };
+
+        /**
+         * 核心逻辑：递归子网拆分
+         * 适用于 IPv4 (maxBits=32) 和 IPv6 (maxBits=128)
+         */
+        function subtractCidr(base, exclude) {
+            // 如果版本不同，无法运算，直接返回 base
+            if (base.version !== exclude.version) return [base];
+
+            // 1. 无交集
+            if (base.end < exclude.start || base.start > exclude.end) {
+                return [base];
+            }
+
+            // 2. exclude 完全包含 base -> 删除 base
+            if (exclude.start <= base.start && exclude.end >= base.end) {
+                return [];
+            }
+
+            // 3. 有重叠或 base 包含 exclude -> 拆分 base
+            // 将 base 拆分为左右两半，prefix + 1
+            const newPrefix = base.prefix + 1;
+            if (newPrefix > base.maxBits) return [base]; // 理论不应发生
+
+            const hostBits = BigInt(base.maxBits) - BigInt(newPrefix);
+            const halfSize = 1n << hostBits;
+            
+            const leftStart = base.start;
+            const leftEnd = leftStart + halfSize - 1n;
+            
+            const rightStart = leftStart + halfSize;
+            const rightEnd = base.end;
+
+            const leftCidr = {
+                start: leftStart,
+                end: leftEnd,
+                prefix: newPrefix,
+                maxBits: base.maxBits,
+                version: base.version
+            };
+
+            const rightCidr = {
+                start: rightStart,
+                end: rightEnd,
+                prefix: newPrefix,
+                maxBits: base.maxBits,
+                version: base.version
+            };
+
+            return [
+                ...subtractCidr(leftCidr, exclude),
+                ...subtractCidr(rightCidr, exclude)
+            ];
+        }
+
+        function calculateGroup(allowedList, disallowedList) {
+            let result = allowedList;
+            for (let dis of disallowedList) {
+                let newResult = [];
+                for (let allow of result) {
+                    newResult = newResult.concat(subtractCidr(allow, dis));
+                }
+                result = newResult;
+            }
+            return result;
+        }
+
+        // 主函数
+        function calculate() {
+            const allowedInput = document.getElementById('allowed-ips').value;
+            const disallowedInput = document.getElementById('disallowed-ips').value;
+            const errorDiv = document.getElementById('error-msg');
+            const resultArea = document.getElementById('result-area');
+            const resultContent = document.getElementById('result-content');
+
+            errorDiv.style.display = 'none';
+            resultArea.style.display = 'none';
+
+            try {
+                // 解析输入
+                const parseList = (str) => {
+                    return str.split(/[,;\n]/)
+                              .map(s => s.trim())
+                              .filter(s => s)
+                              .map(s => IpUtils.parseCidr(s));
+                };
+
+                const allowedObjs = parseList(allowedInput);
+                const disallowedObjs = parseList(disallowedInput);
+
+                if (allowedObjs.length === 0) {
+                    throw new Error("Please enter at least one Allowed IP.");
+                }
+
+                // 分类 V4 和 V6
+                const allowedV4 = allowedObjs.filter(x => x.version === 4);
+                const allowedV6 = allowedObjs.filter(x => x.version === 6);
+                
+                const disallowedV4 = disallowedObjs.filter(x => x.version === 4);
+                const disallowedV6 = disallowedObjs.filter(x => x.version === 6);
+
+                // 分别计算
+                const resultV4 = calculateGroup(allowedV4, disallowedV4);
+                const resultV6 = calculateGroup(allowedV6, disallowedV6);
+
+                // 合并并格式化
+                const finalResults = [...resultV4, ...resultV6];
+                
+                if (finalResults.length === 0) {
+                    resultContent.textContent = "No IPs allowed (All ranges excluded).";
+                } else {
+                    const resultStrings = finalResults.map(obj => IpUtils.formatCidr(obj));
+                    resultContent.textContent = resultStrings.join(', ');
+                }
+
+                resultArea.style.display = 'block';
+
+            } catch (e) {
+                console.error(e);
+                errorDiv.textContent = "Error: " + e.message;
+                errorDiv.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

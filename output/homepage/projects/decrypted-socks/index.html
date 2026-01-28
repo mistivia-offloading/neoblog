@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>decrypted-socks</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style3.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<pre class="back"><a href="../">../</a></pre>
+
+<h1>decrypted-socks</h1>
+<p>This project is created using vibe coding.</p>
+
+<h2>Download</h2>
+
+<pre><code>git clone https://git.mistivia.com/decrypted-socks.git
+</code></pre>
+
+<h2>Features</h2>
+
+<ul>
+<li>Converts a SOCKS5 proxy requiring username/password authentication into a local SOCKS5 proxy without authentication.</li>
+</ul>
+
+
+<h2>Setup</h2>
+
+<ol>
+<li>Copy <code>.env.example</code> to <code>.env</code> and fill in your upstream proxy details:
+<code>
+cp .env.example .env
+</code></li>
+<li>Run the proxy:
+<code>
+./start.sh
+</code></li>
+</ol>
+
+
+<h2>License</h2>
+
+<p>This project is released under GPLv3.</p>
+
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script data-goatcounter="https://blog.mistivia.com:8081/count"
+        async src="https://blog.mistivia.com:8081/count.js"></script>
+</html>
+

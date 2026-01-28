@@ -1,0 +1,70 @@
+\hsize = 118mm
+\vsize = 175mm
+\pdfpagewidth=148mm
+\pdfpageheight=210mm
+\hoffset = -10.4mm
+\voffset = -10.4mm
+
+\font\zhtitle="KingHwa_OldSong" at 25pt
+\font\zhi="KingHwa_OldSong" at 18pt
+\font\zhii="KingHwa_OldSong" at 15pt
+\font\zhiii="KingHwa_OldSong" at 12pt
+\font\zh="KingHwa_OldSong" at 11pt
+\font\mytt=cmtt10 at 10pt
+\footline={\hss\zh\folio\hss}
+\zh
+
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt
+\baselineskip=14pt
+\parindent=2.1em
+\raggedbottom
+% \parskip=1mm
+
+\def\title#1{\centerline{\parindent=0mm \zhtitle #1}\vskip 7mm}
+\def\date#1{\centerline{\parindent=0mm #1} \vskip 5mm}
+\def\s#1{\vskip 7mm{\parindent=0mm \zhi #1}\vskip 2mm}
+\def\ss#1{\vskip 7mm{\parindent=0mm \zhii #1}\vskip 2mm}
+\def\sss#1{\vskip 5mm{\parindent=0mm \zhiii #1}\vskip 2mm}
+\def\lcurly{\char123}
+\def\vbar{\char124}
+\def\rcurly{\char125}
+\def\li{\item{•}}
+\def\bli{\vskip 5pt\baselineskip=11pt}
+\def\eli{\vskip 5pt\baselineskip=14pt}
+\def\img#1#2{\centerline{\XeTeXpicfile "#1" width #2\hsize}}
+\def\en#1{\thinspace #1\thinspace}
+
+\def\makeother#1{\catcode`#1=12 }
+\def\dospecials{
+  \do\\\do\{\do\}\do\$\do\&
+  \do\#\do\^\do\_\do\%\do\~
+}
+\def\uncatcodespecials{%
+  \def\do##1{\makeother##1}%
+  \dospecials
+}
+\def\setupverbatim{
+  \mytt
+  \obeyspaces
+  \obeylines
+  \uncatcodespecials
+}
+{\obeyspaces\global\let =\ } 
+\def\bcode{
+  \begingroup
+  \vskip 5pt
+  \baselineskip=12pt
+  \setupverbatim
+  \catcode`\|=0  % set | to special
+  \catcode`\\=12 % set \ to normal
+  \verbatimcontent
+}
+\def\verbatimcontent{} 
+\def\ecode{\endgroup\vskip 5pt}
+
+\def\href#1#2{%
+  \special{html:<a href="#1">}%
+  \underbar{#2}%
+  \special{html:</a>}%
+}

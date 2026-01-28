@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>友情链接</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style3.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<pre class="back"><a href="../">../</a></pre>
+
+<h1>友情链接</h1>
+<ul id="lnks">
+<li><a href="https://unstablebeagle.bearblog.dev/">比格犬劳动饮酒叹息</a></li>
+<li><a href="https://blog.gyara.moe/">島風造船所</a></li>
+<li><a href="https://blog.dctewi.com/">冻葱Tewi</a></li>
+<li><a href="https://blog.lycheeee.top/">Lychee’s Blog</a></li>
+<li><a href="https://nachtzug.xyz/">Nachtzug</a></li>
+<li><a href="https://asaba.sakuragawa.moe/">櫻川家::浅羽</a></li>
+<li><a href="https://blog.bgme.me/">影子屋</a></li>
+<li><a href="https://metanoise.in/">有希書簡</a></li>
+<li><a href="https://blog.pullopen.xyz/">于光年外遥望</a></li>
+</ul>
+
+<p>失效链接：</p>
+
+<ul>
+<li><del><a href="https://ioover.net/">读写终子</a></del></li>
+<li><del><a href="https://coccimore.cyou/">苹果核聚变</a></del></li>
+</ul>
+
+<script data-goatcounter="https://blog.mistivia.com:8081/count"
+        async src="https://blog.mistivia.com:8081/count.js"></script>
+<script>
+function shuffleArray(array) {
+  let currentIndex = array.length,
+    randomIndex;
+
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex],
+    ];
+  }
+
+  return array;
+}
+
+function shuffleListItems() {
+  const ul = document.getElementById('lnks');
+
+  if (!ul) {
+    return;
+  }
+
+  const listItems = Array.from(ul.children);
+  const shuffledItems = shuffleArray(listItems);
+
+  shuffledItems.forEach(item => {
+    ul.appendChild(item);
+  });
+}
+
+shuffleListItems();
+</script>
+
+<hr>
+<p>Mistivia - <a href="https://mistivia.com">https://mistivia.com</p>
+</body>
+</html>
+
