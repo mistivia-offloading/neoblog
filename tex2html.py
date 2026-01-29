@@ -2,7 +2,6 @@ import os
 import sys
 import argparse
 import subprocess
-import shutil
 from urllib.parse import quote
 
 def parse_arguments():
@@ -89,6 +88,7 @@ def compile_tex(filepath, output_dir):
         f"-output-directory={abs_output_dir}",
         file_name
     ]
+    print(" ".join(cmd))
 
     try:
         # 3. 执行编译
@@ -108,23 +108,53 @@ def compile_tex(filepath, output_dir):
         print(e.stdout.decode('utf-8', errors='ignore'))
         sys.exit(1)
 
-def generate_html(output_dir, pdf_filename, srctext):
+def generate_html(output_dir, pdf_filename, title, srctext):
     """
     生成包含自动跳转功能的 index.html
     """
     html_path = os.path.join(output_dir, "index.html")
-    pdf_url = quote(f"./{pdf_filename}")
     
     html_content = f"""<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url={pdf_url}">
-    <title>Redirecting...</title>
+<title>{title}</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {{
+        width: 100%;
+        height: 80vh;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+    }}
+    .pdf-wrapper iframe {{
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }}
+</style>
 </head>
 <body>
-    <p>If you are not redirected automatically, follow this <a href="{pdf_url}">link to the PDF</a>.</p>
+<pre class="back"><a href="../">../</a></pre>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">{srctext}</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file={pdf_filename}">
+        <p><a href="{pdf_filename}">{pdf_filename}</a></p>
+    </iframe>
+</div>
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
 </body>
+<script data-goatcounter="https://blog.mistivia.com:8081/count"
+        async src="https://blog.mistivia.com:8081/count.js"></script>
 </html>
 """
     
@@ -137,7 +167,7 @@ def main():
     input_path = args.filepath
     
     title = get_title_from_tex(input_path)
-    srctext = getcontent().replace('<', '&lt;').replace('>', '&gt;')
+    srctext = getcontent(input_path).replace('<', '&lt;').replace('>', '&gt;')
     print(f"Extracted Title: {title}")
 
     dir_name = os.path.dirname(input_path)
@@ -150,20 +180,12 @@ def main():
 
     compile_tex(input_path, output_dir)
 
-    original_pdf_path = os.path.join(output_dir, f"{base_name_no_ext}.pdf")
-    target_pdf_name = f"{title}.pdf"
+    original_pdf_path = os.path.join(output_dir, f"index.pdf")
+    target_pdf_name = f"index.pdf"
     target_pdf_path = os.path.join(output_dir, target_pdf_name)
+    print(target_pdf_path[11:])
 
-    if os.path.exists(original_pdf_path):
-        if os.path.exists(target_pdf_path):
-            os.remove(target_pdf_path)
-        os.rename(original_pdf_path, target_pdf_path)
-        print(f"Renamed PDF to: {target_pdf_path}")
-    else:
-        print(f"Error: Expected output file '{original_pdf_path}' not found.")
-        sys.exit(1)
-
-    generate_html(output_dir, target_pdf_name, srctext)
+    generate_html(output_dir, target_pdf_path[11:], title, srctext)
     print("Done.")
 
 if __name__ == "__main__":

@@ -16,13 +16,13 @@
 
 \XeTeXlinebreaklocale "zh"
 \XeTeXlinebreakskip = 0pt plus 1pt
-\baselineskip=14pt
+\baselineskip=16pt
 \parindent=2.1em
 \raggedbottom
 % \parskip=1mm
 
-\def\title#1{\centerline{\parindent=0mm \zhtitle #1}\vskip 7mm}
-\def\date#1{\centerline{\parindent=0mm #1} \vskip 5mm}
+\def\title#1{\centerline{\parindent=0mm\zhtitle #1}}
+\def\date#1{\vskip 7mm\centerline{\parindent=0mm #1} \vskip 5mm}
 \def\s#1{\vskip 7mm{\parindent=0mm \zhi #1}\vskip 2mm}
 \def\ss#1{\vskip 7mm{\parindent=0mm \zhii #1}\vskip 2mm}
 \def\sss#1{\vskip 5mm{\parindent=0mm \zhiii #1}\vskip 2mm}
@@ -31,9 +31,10 @@
 \def\rcurly{\char125}
 \def\li{\item{•}}
 \def\bli{\vskip 5pt\baselineskip=11pt}
-\def\eli{\vskip 5pt\baselineskip=14pt}
+\def\eli{\vskip 5pt\baselineskip=16pt}
 \def\img#1#2{\centerline{\XeTeXpicfile "#1" width #2\hsize}}
 \def\en#1{\thinspace #1\thinspace}
+\def\sp{\thinspace}
 
 \def\makeother#1{\catcode`#1=12 }
 \def\dospecials{
