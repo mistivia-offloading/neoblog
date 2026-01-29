@@ -103,7 +103,7 @@ iptables -t nat -I PREROUTING \
 
 首先下载安装Windows上的Wireguard客户端：#link("https://download.wireguard.com/windows-client/", "下载链接")。
 
-然后计算一下Wiregurad的AllowedIP，可以使用#link("/pages/wgipcalc.html", "这个网站")来计算。在Allowed IPs中填入`0.0.0.0/0`。在Disallowed IPs中填入：`192.168.0.0/16, 123.123.123.123/32`，然后点击“Calculate”，把`AllowedIPs = ...`一大串复制下来。
+然后计算一下Wiregurad的AllowedIP，可以使用#link("https://www.procustodibus.com/blog/2021/03/wireguard-allowedips-calculator/", "这个网站")来计算。在Allowed IPs中填入`0.0.0.0/0`。在Disallowed IPs中填入：`192.168.0.0/16, 123.123.123.123/32`，然后点击“Calculate”，把`AllowedIPs = ...`一大串复制下来。
 
 创建一个conf扩展名的文件，比如`wg0.conf`，用记事本打开，填入：
 
