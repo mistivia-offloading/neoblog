@@ -98,6 +98,7 @@ def generate_html(output_dir, pdf_url, tilte, srctext):
 </head>
 <body>
 <pre class="back"><a href="../">../</a></pre>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">{srctext}</pre>
 <div class="pdf-wrapper">
     <iframe src="/pdfjs/web/viewer.html?file={pdf_url}">
         <p><a href="{pdf_url}">{pdf_url}</a></p>
