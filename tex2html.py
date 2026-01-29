@@ -10,6 +10,20 @@ def parse_arguments():
     parser.add_argument("filepath", help="The path to the input .tex file (e.g., source/index.tex)")
     return parser.parse_args()
 
+def getcontent(filepath):
+    """
+    读取 tex 文件的第一行，提取 %% 后的内容作为标题
+    """
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        print(f"Error: File '{filepath}' not found.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        sys.exit(1)
+
 def get_title_from_tex(filepath):
     """
     读取 tex 文件的第一行，提取 %% 后的内容作为标题
@@ -94,7 +108,7 @@ def compile_tex(filepath, output_dir):
         print(e.stdout.decode('utf-8', errors='ignore'))
         sys.exit(1)
 
-def generate_html(output_dir, pdf_filename):
+def generate_html(output_dir, pdf_filename, srctext):
     """
     生成包含自动跳转功能的 index.html
     """
@@ -123,6 +137,7 @@ def main():
     input_path = args.filepath
     
     title = get_title_from_tex(input_path)
+    srctext = getcontent().replace('<', '&lt;').replace('>', '&gt;')
     print(f"Extracted Title: {title}")
 
     dir_name = os.path.dirname(input_path)
@@ -148,7 +163,7 @@ def main():
         print(f"Error: Expected output file '{original_pdf_path}' not found.")
         sys.exit(1)
 
-    generate_html(output_dir, target_pdf_name)
+    generate_html(output_dir, target_pdf_name, srctext)
     print("Done.")
 
 if __name__ == "__main__":

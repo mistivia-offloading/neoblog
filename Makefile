@@ -19,7 +19,7 @@ $(BUILD_TARGETS):$(BUILDDIR)/%.html: $(SRCDIR)/%.md
 
 $(TYP_TARGETS):$(BUILDDIR)/%.html: $(SRCDIR)/%.typ
 	@mkdir -p $(@D)
-	python typ2svg.py $<
+	python typ2html.py $<
 
 $(TEX_TARGETS):$(BUILDDIR)/%.html: $(SRCDIR)/%.tex
 	@mkdir -p $(@D)

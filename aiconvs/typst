@@ -1,0 +1,27 @@
+typst write pdf output to a specific directory:To write the PDF output to a specific directory in Typst, you must provide the full output path (including the filename) as the second argument to the compile command.
+
+### Basic Command
+Run this in your terminal:
+
+```bash
+typst compile main.typ path/to/output/document.pdf
+```
+
+**Note:** You must specify the **full filename** (e.g., `document.pdf`) at the end of the path. Typst does not automatically infer the filename if you only provide a directory (e.g., `path/to/output/` will not work).
+
+### Important Details
+
+1.  **Directory Must Exist:** Typst generally will not create the output directory for you. If `path/to/output/` does not exist, the command will fail. You should create the folder first:
+    *   **Linux/macOS:** `mkdir -p path/to/output && typst compile main.typ path/to/output/doc.pdf`
+    *   **Windows (PowerShell):** `mkdir path\to\output; typst compile main.typ path\to\output\doc.pdf`
+
+2.  **Watch Mode:** The same syntax works for `typst watch`, which automatically recompiles the PDF whenever you save changes to the source file:
+    ```bash
+    typst watch main.typ path/to/output/document.pdf
+    ```
+
+3.  **Project Root:** If moving the output file causes issues with relative paths (like images or imports not being found), you may need to explicitly set the project root using the `--root` flag:
+    ```bash
+    typst compile --root . main.typ ../build/output.pdf
+    ```
+    This tells Typst to treat the current directory (`.`) as the project root, even if you are writing the output file somewhere outside of it.
