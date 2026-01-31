@@ -11,8 +11,5 @@ cp output/homepage/style*.css /var/ygg/web/
 
 rsync -avz --delete output/blog/ root@raye:/volume/webroot/blog/
 rsync -avz --delete output/homepage/ root@raye:/volume/webroot/homepage/
-cp output/blog/index.html /var/ygg/web/blog.html
-cp output/blog/index.xml /var/ygg/web/index.xml
-rsync -avz --delete output/blog/posts/ /var/ygg/web/posts/
-rsync -avz --delete output/blog/enposts/ /var/ygg/web/enposts/
-sed -i 's#https://mistivia.com#/#g' /var/ygg/web/blog.html
+rsync -avz --delete output/blog/ /var/ygg/web/blog/
+sed -i 's#href="https://mistivia.com"#href="http://\[200:2829:50f2:e2f1:96e1:3d6d:e107:b39f\]/"#g' /var/ygg/web/blog/index.html
