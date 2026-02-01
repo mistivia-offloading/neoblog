@@ -161,8 +161,8 @@ emailElement.innerHTML = decodedString;
         async src="https://blog.mistivia.com:8081/count.js"></script>
 <script>
 var seth;
-seth = function() {{document.getElementsByClassName('pdf-wrapper')[0].style.height = document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight + 50 + 'px'; setTimeout(seth, 3000);}}
-setTimeout(seth, 3000);
+seth = function() {{document.getElementsByClassName('pdf-wrapper')[0].style.height = document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight + 50 + 'px'; setTimeout(seth, 1000);}}
+setTimeout(seth, 1000);
 </script>
 </html>
 """
