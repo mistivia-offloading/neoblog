@@ -150,3 +150,7 @@ figcaption {
 .padded {
   padding: 0px 20px;
 }
+
+.pdf-wrapper {
+  border-width:0px;
+}
