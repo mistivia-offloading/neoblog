@@ -97,15 +97,19 @@ def generate_html(output_dir, pdf_url, tilte, srctext):
 </style>
 </head>
 <body>
+<div style="padding:0px 5px;">
 <pre class="back"><a href="../">../</a></pre>
+</div>
 <pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">{srctext}</pre>
 <div class="pdf-wrapper">
     <iframe src="/pdfjs/web/viewer.html?file={pdf_url}">
         <p><a href="{pdf_url}">{pdf_url}</a></p>
     </iframe>
 </div>
+<div style="padding:0px 5px;">
 <hr>
 <p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
 <script>
 var emailElement = document.getElementById('email');
 var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
@@ -115,6 +119,11 @@ emailElement.innerHTML = decodedString;
 </body>
 <script data-goatcounter="https://blog.mistivia.com:8081/count"
         async src="https://blog.mistivia.com:8081/count.js"></script>
+<script>
+var seth;
+seth = function() {{document.getElementsByClassName('pdf-wrapper')[0].style.height = document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight + 50 + 'px'; setTimeout(seth, 3000);}}
+setTimeout(seth, 3000);
+</script>
 </html>
 """
     
