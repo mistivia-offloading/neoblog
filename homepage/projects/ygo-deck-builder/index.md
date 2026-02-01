@@ -7,4 +7,4 @@ YGO Deck Builder
 
 ## Download
 
-    git clone https://git.mistivia.com/ygo-deck-builder
+    git clone --depth 1 https://git.mistivia.com/ygo-deck-builder

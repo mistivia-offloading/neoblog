@@ -5,7 +5,7 @@ After trying very hard, I have to admit that my mind is too weak to understand l
 
 # Download
 
-    git clone https://git.mistivia.com/accessor-hs.git
+    git clone --depth 1 https://git.mistivia.com/accessor-hs.git
 
 ## Usage
 

@@ -7,7 +7,7 @@ It runs a local SRT server, receive live video, turns it into HLS segments (.m3u
 
 ## Download
 
-    git clone https://git.mistivia.com/ezlive.git
+    git clone --depth 1 https://git.mistivia.com/ezlive.git
 
 ## Build
 
