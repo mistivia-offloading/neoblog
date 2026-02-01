@@ -85,7 +85,6 @@ def generate_html(output_dir, pdf_url, tilte, srctext):
     .pdf-wrapper {{
         width: 100%;
         height: 80vh;
-        border: 1px solid #ccc;
         margin-bottom: 20px;
     }}
     .pdf-wrapper iframe {{
