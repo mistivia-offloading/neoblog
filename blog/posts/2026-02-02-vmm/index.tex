@@ -31,7 +31,7 @@
 
 如果我们选择从\sp 16\sp 位启动点启动内核，就意味着我们要实现\sp BIOS\sp 模拟，想想就十分繁琐。而如果从\sp 64\sp 位启动点开始启动，我们就必须首先进入\sp CPU\sp 的\sp 64\sp 位模式。而\sp x86 CPU\sp 的\sp 64\sp 位模式要求必须分页，所以我们还要先处理内存映射并创建页表。
 
-相比之下，32\sp 位启动则相对简单，并不要求分页。虽然我们的\sp Linux\sp 内核是\sp 64\sp 位的，但是\sp Linux\sp 内核会帮我们处理好分页并进入64位模式，并不需要担心。我们是来做虚拟机管理器的，不是来做\sp bootloader\sp 和操作系统的，所以自然，从\sp 32\sp 位启动点启动是最好的选择。
+相比之下，32\sp 位启动就简单多了，不需要BIOS。也不要求创建页表。虽然我们的\sp Linux\sp 内核是\sp 64\sp 位的，但是\sp Linux\sp 内核会帮我们处理好分页并进入64位模式，并不需要担心。我们是来做虚拟机管理器的，不是来做\sp bootloader\sp 和操作系统的，所以自然，从\sp 32\sp 位启动点启动是最好的选择。
 
 根据\sp Linux\sp 内核的启动协议，CPU\sp 在跳转到\sp 32\sp 位内核启动点之前，需要进入32位的“平坦模式”，在这个模式下，CPU\sp 在\sp 32\sp 位模式中运行，没有没有分页，所有内存地址均直接映射到物理内存。
 
@@ -129,7 +129,17 @@ busybox --install bin/
 \bcode
 #!/bin/sh
 
+mount -t devtmpfs devtmpfs /dev
+mount -t proc proc /proc
+mount -t sysfs sys /sys
+mdev -s
 
+echo "BusyBox!"
+/bin/sh -l
+
+while : ; do
+    sleep 1
+done
 |ecode
 
 
@@ -137,7 +147,7 @@ busybox --install bin/
 
 \bcode
 chmod +x init
-cpio
+find . -print0 |vbar cpio --null -ov --format=newc |vbar gzip > ../initrd
 |ecode
 
 这样我们就得到了我们的初始化虚拟盘：initrd文件。
