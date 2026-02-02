@@ -33,7 +33,55 @@
 
 相比之下，32\sp 位启动则相对简单，并不要求分页。虽然我们的\sp Linux\sp 内核是\sp 64\sp 位的，但是\sp Linux\sp 内核会帮我们处理好分页并进入64位模式，并不需要担心。我们是来做虚拟机管理器的，不是来做\sp bootloader\sp 和操作系统的，所以自然，从\sp 32\sp 位启动点启动是最好的选择。
 
-根据\sp Linux\sp 内核的启动协议，CPU\sp 在跳转到\sp 32\sp 位内核启动点之前，需要进入“平坦模式”。
+根据\sp Linux\sp 内核的启动协议，CPU\sp 在跳转到\sp 32\sp 位内核启动点之前，需要进入32位的“平坦模式”，在这个模式下，CPU\sp 在\sp 32\sp 位模式中运行，没有没有分页，所有内存地址均直接映射到物理内存。
+
+为了进入这个模式，在实际的机器中，有一个特别复杂的初始化流程。具体可以查看\sp \href{https://wiki.osdev.org/GDT_Tutorial}{OSDev Wiki}，但是这个也完全是\sp x86\sp 架构的历史糟粕，并不值得耗费心力。总之，利用\sp KVM\sp 提供的接口，设置若干个段寄存器和一个特殊的\sp cr0\sp 寄存器的内部状态，就可以进入\sp 32\sp 位平坦模式了：
+
+\bcode
+void set_flat_mode(struct kvm_segment *seg) {
+    seg->base = 0;
+    seg->limit = 0xffffffff;
+    seg->g = 1;
+    seg->db = 1;
+}
+
+struct kvm_sregs sregs;
+ioctl(cpu_fd, KVM_GET_SREGS, &sregs);
+set_flat_mode(&sregs.cs);
+set_flat_mode(&sregs.ds);
+set_flat_mode(&sregs.es);
+set_flat_mode(&sregs.fs);
+set_flat_mode(&sregs.gs);
+set_flat_mode(&sregs.ss);
+sregs.cr0 |vbar= 0x1;
+ioctl(cpu_fd, KVM_SET_SREGS, &sregs);
+|ecode
+
+最后，需要\sp rip\sp 寄存器设置为\sp 0x100000，稍后内核启动点将会加载到这个地方，而\sp CPU\sp 也会从这里启航。而\sp rsp\sp 寄存器需要设置为\sp 0x10000，内核的启动参数将会加载到这个位置：
+
+\bcode
+struct kvm_regs regs;
+ioctl(cpu_fd, KVM_GET_REGS, &regs);
+regs.rip = 0x100000;
+regs.rsi = 0x10000;
+ioctl(cpu_fd, KVM_SET_REGS, &regs);
+|ecode
+
+至于为什么是这两个数字，下一节将会介绍，这是\sp Linux\sp 内核启动协议的一部分。
+
+最后一步是设置\sp CPUID，我们从\sp KVM API\sp 中获取\sp KVM\sp 支持的\sp CPUID，然后设置给虚拟\sp CPU\sp 即可：
+
+\bcode
+struct kvm_cpuid2 *cpuid;
+int max_entries = 100;
+cpuid = malloc(sizeof(*cpuid) + 
+    max_entries * sizeof(struct kvm_cpuid_entry2));
+cpuid->nent = max_entries;
+ioctl(kvm_fd, KVM_GET_SUPPORTED_CPUID, cpuid)
+ioctl(cpu_fd, KVM_SET_CPUID2, cpuid)
+|ecode
+
+这样，CPU\sp 初始化完毕，只欠东风。
 
 \s {加载内核}
 
@@ -41,9 +89,9 @@ TODO
 
 \s {串口模拟}
 
-这一节没有什么内容，因为懒得读硬件手册，所以我让Kimi模型给我生成了一个凑合能用的串口模拟程序。这个串口模拟器只能输出内容，无法接收输入。不过在现在这个阶段凑合能用。
+这一节没有什么内容，因为懒得读硬件手册，所以我让\sp Kimi\sp 模型给我生成了一个凑合能用的串口模拟程序。这个串口模拟器只能输出内容，无法接收输入。不过在现在这个阶段已经够了。
 
-串口模拟相关的代码在\sp {\itt serial\_init}\sp 和\sp {\itt handle\_serial}\sp 这两个函数中。
+串口模拟相关的代码在\sp {\itt serial\_init}\sp 和\sp {\itt handle\_serial}\sp 这两个函数中。串口模拟器的初始化需要在前面创建虚拟机的时候一并完成。
 
 \s {运行虚拟\sp CPU}
 
@@ -51,11 +99,53 @@ TODO
 
 \s {创建\sp Busybox\sp 内存虚拟盘}
 
-TODO
+首先安装Busybox:
+
+\bcode
+sudo pacman -S Busybox
+|ecode
+
+然后创建一个rootfs目录：
+
+\bcode
+mkdir rootfs
+|ecode
+
+然后创建一些必备的目录：
+
+\bcode
+cd rootfs
+mkdir dev sys proc bin
+|ecode
+
+然后把Busybox安装到这个目录里面：
+
+\bcode
+busybox --install bin/
+|ecode
+
+然后创建一个init脚本：
+
+\bcode
+#!/bin/sh
+
+
+|ecode
+
+
+把这个init脚本设置为可运行，然后把整个目录打包成一个cpio镜像：
+
+\bcode
+chmod +x init
+cpio
+|ecode
+
+这样我们就得到了我们的初始化虚拟盘：initrd文件。
+
 
 \s {收官}
 
-首先从Linux本机薅一个内核出来：
+最后就是见证奇迹的时刻了。首先从Linux本机薅一个内核出来：
 
 \bcode
 cp /boot/vmlinuz-linux ./vmlinuz
@@ -75,7 +165,7 @@ gcc small_vmm.c -o small_vmm
 sudo ./small_vmm vmlinuz initrd
 |ecode
 
-如果顺利的话，就能像开头那张图一样，看到Busybox的Shell提示符。不过输入大概率是没有反应的，因为前面没有完整实现串口模拟，没有做串口输入的功能。
+如果顺利的话，就能像开头那张图一样，看到Busybox的Shell提示符。不过输入命令和按回车都是没有反应的，因为前面没有完整实现串口模拟，没有做串口输入的功能。只能按Ctrl+C退出。
 
 \s {小结}
 
