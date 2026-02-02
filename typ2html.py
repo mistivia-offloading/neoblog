@@ -119,8 +119,9 @@ emailElement.innerHTML = decodedString;
 <script data-goatcounter="https://blog.mistivia.com:8081/count"
         async src="https://blog.mistivia.com:8081/count.js"></script>
 <script>
+var max = function(x, y) {{return x < y ? y : x}};
 var seth;
-seth = function() {{document.getElementsByClassName('pdf-wrapper')[0].style.height = document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight + 50 + 'px'; setTimeout(seth, 1000);}}
+seth = function() {{document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 50 + 'px'; setTimeout(seth, 1000);}}
 setTimeout(seth, 1000);
 </script>
 </html>
