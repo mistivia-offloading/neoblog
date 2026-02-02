@@ -10,7 +10,8 @@
 \font\zhii="KingHwa_OldSong" at 15pt
 \font\zhiii="KingHwa_OldSong" at 12pt
 \font\zh="KingHwa_OldSong" at 11pt
-\font\mytt=cmtt10 at 10pt
+\font\mytt=cmtt9
+\font\itt=cmtt10 at 11pt
 \footline={\hss\zh\folio\hss}
 \zh
 
@@ -19,7 +20,8 @@
 \baselineskip=16pt
 \parindent=2.1em
 \raggedbottom
-% \parskip=1mm
+\emergencystretch=1em
+\overfullrule=0pt
 
 \def\title#1{\centerline{\parindent=0mm\zhtitle #1}}
 \def\date#1{\vskip 7mm\centerline{\parindent=0mm #1} \vskip 5mm}
@@ -30,9 +32,9 @@
 \def\vbar{\char124}
 \def\rcurly{\char125}
 \def\li{\item{•}}
-\def\bli{\vskip 5pt\baselineskip=11pt}
+\def\bli{\vskip 5pt\baselineskip=13pt}
 \def\eli{\vskip 5pt\baselineskip=16pt}
-\def\img#1#2{\centerline{\XeTeXpicfile "#1" width #2\hsize}}
+\def\img#1#2{\vskip 3mm \centerline{\XeTeXpicfile "#1" width #2\hsize} \vskip 3mm}
 \def\en#1{\thinspace #1\thinspace}
 \def\sp{\thinspace}
 

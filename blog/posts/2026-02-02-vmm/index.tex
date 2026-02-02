@@ -1,0 +1,106 @@
+%% 从零开始的虚拟机管理器
+\input template.tex
+\title {从零开始的虚拟机管理器}
+\date {2026\sp 年\sp 2\sp 月\sp 2\sp 日}
+
+最近因为想学\sp eBPF\sp 的关系，接触到了\sp Firecracker\sp 这个虚拟机管理器，结果正事没干一头拐进了虚拟化的坑里。本来我对虚拟机管理器的印象都是\sp QEMU、VMWare\sp 之类的庞然大物，不过\sp Firecracker\sp 突然让我发现虚拟机管理器其实也不见得非得这么复杂，于是就萌生了自己做一个虚拟机管理器的想法。
+
+最后的成果是成功进入了\sp Busybox\sp 的\sp Shell，如下图：
+
+\img{1.jpg}{0.75}
+
+相关的代码放在了\sp\href{https://gist.github.com/mistivia/701ce77756b3dd5e39581be9c5a2c30b}{Gist}\sp 上面。本文的后面也会主要就着这个源代码讲解。
+
+过程中也参考了不少之前已有的资料，会一并放在末尾。
+
+\s {创建虚拟机}
+
+这一步主要用\sp {\itt ioctl}\sp 调用一些\sp KVM\sp 的接口，代码在\sp {\itt vm\_guest\_init}\sp 函数当中。这一步没什么好介绍的，就是一些套路化的东西：
+
+\bli
+    \li {\tt KVM\_CREATE\_VM}：创建虚拟机
+    \li {\tt KVM\_CREATE\_IRQCHIP}：创建中断芯片模拟程序
+    \li {\tt KVM\_CREATE\_PIT2}：创建时钟芯片模拟程序
+    \li {\tt KVM\_SET\_USER\_MEMORY\_REGION}：加载用\sp mmap\sp 分配出来的内存
+    \li {\tt KVM\_CREATE\_VCPU}：创建虚拟\sp CPU
+\eli
+
+\s {CPU\sp 初始化}
+
+这里就来到了本文的第一个分歧点。我们的目标是加载并启动\sp Linux\sp 内核，而因为\sp x86\sp 架构臭名昭著的历史包袱，64\sp 位的\sp Linux\sp 内核中实际上有\sp 3\sp 个启动点，分别对应了\sp 16\sp 位、32\sp 位，以及\sp 64\sp 位。如何选择就成了一个问题。
+
+如果我们选择从\sp 16\sp 位启动点启动内核，就意味着我们要实现\sp BIOS\sp 模拟，想想就十分繁琐。而如果从\sp 64\sp 位启动点开始启动，我们就必须首先进入\sp CPU\sp 的\sp 64\sp 位模式。而\sp x86 CPU\sp 的\sp 64\sp 位模式要求必须分页，所以我们还要先处理内存映射并创建页表。
+
+相比之下，32\sp 位启动则相对简单，并不要求分页。虽然我们的\sp Linux\sp 内核是\sp 64\sp 位的，但是\sp Linux\sp 内核会帮我们处理好分页并进入64位模式，并不需要担心。我们是来做虚拟机管理器的，不是来做\sp bootloader\sp 和操作系统的，所以自然，从\sp 32\sp 位启动点启动是最好的选择。
+
+根据\sp Linux\sp 内核的启动协议，CPU\sp 在跳转到\sp 32\sp 位内核启动点之前，需要进入“平坦模式”。
+
+\s {加载内核}
+
+TODO
+
+\s {串口模拟}
+
+这一节没有什么内容，因为懒得读硬件手册，所以我让Kimi模型给我生成了一个凑合能用的串口模拟程序。这个串口模拟器只能输出内容，无法接收输入。不过在现在这个阶段凑合能用。
+
+串口模拟相关的代码在\sp {\itt serial\_init}\sp 和\sp {\itt handle\_serial}\sp 这两个函数中。
+
+\s {运行虚拟\sp CPU}
+
+TODO
+
+\s {创建\sp Busybox\sp 内存虚拟盘}
+
+TODO
+
+\s {收官}
+
+首先从Linux本机薅一个内核出来：
+
+\bcode
+cp /boot/vmlinuz-linux ./vmlinuz
+|ecode
+
+不同发行版下面内核文件的名字可能不同，但是应该都大体差不多。
+
+然后编译虚拟机管理器的代码：
+
+\bcode
+gcc small_vmm.c -o small_vmm
+|ecode
+
+最后运行：
+
+\bcode
+sudo ./small_vmm vmlinuz initrd
+|ecode
+
+如果顺利的话，就能像开头那张图一样，看到Busybox的Shell提示符。不过输入大概率是没有反应的，因为前面没有完整实现串口模拟，没有做串口输入的功能。
+
+\s {小结}
+
+虽然
+
+但是另一方面，这个虚拟机管理器距离有实际用途却也并不遥远。
+
+如果说\sp App\sp 开发、前端、CRUD\sp 后端这些是“显宗”的话，一些比较底层的计算机领域，就全是“密宗”了：虽然实际上并不是很难的东西，但是因为比较小众，很多知识只能依赖口耳相传和啃源代码，甚至有时候连最强的\sp AI\sp 也难以给出良好的解答。虚拟化虽然也算是个很大众的技术了，但是具体到一些细节，就又变成了一个比较接近“密宗”的东西。这也是我写这篇文章的动机。
+
+\s {下一步计划}
+
+至于下一步，首先自然是要把串口模拟完整做出来，这样就可以在控制台上输入，为此可能需要阅读\sp 8250\sp 芯片的手册和资料。
+
+然后就是实现\sp Virual IO\sp 设备的模拟了，需要参考\href{https://docs.oasis-open.org/virtio/virtio/v1.0/virtio-v1.0.html}{这份文档}。
+
+\s {参考资料}
+
+\bli
+    \li \href{https://www.kernel.org/doc/html/v6.1/x86/boot.html}{The Linux/x86 Boot Protocol}
+    \li \href{https://docs.kernel.org/virt/kvm/api.html}{The Definitive KVM API Documentation}
+    \li \href{https://wdv4758h.github.io/notes/blog/linux-kernel-boot.html}{Linux Kernel Boot}
+    \li \href{https://www.ihcblog.com/rust-mini-vmm-1/}{用\sp Rust\sp 实现极简\sp VMM - Ihcblog!}
+    \li \href{https://docs.kernel.org/admin-guide/kernel-parameters.html}{The kernel’s command-line parameters}
+    \li \href{https://gist.github.com/zserge/ae9098a75b2b83a1299d19b79b5fe488}{kvm\_host.c - GitHub Gist}
+    \li \href{https://github.com/rust-vmm/vmm-reference/}{vmm-reference - GitHub}
+\eli
+
+\bye
