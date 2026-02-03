@@ -161,7 +161,7 @@ Tell the kernel that we loaded the kernel at  1MB:
 zeropage->hdr.loadflags ||= LOADED_HIGH;
 |ecode
 
-The most troublesome step is setting the memory layout. Here I chose to mark the regions  0-640KB and  1MB-1GB as available memory. As for why there must be a hole between  640KB and  1MB, I don't know either; I only found that setting it incorrectly might cause a  kernel panic. But this is again caused by the historical dregs of the  x86 architecture, so I chose not to dive into it.
+The most troublesome step is setting the memory layout. Here I chose to mark the regions  0-640KB and  1MB-1GB as available memory. As for why there must be a hole between  640KB and  1MB, I don't know; I only found that setting it incorrectly might cause a  kernel panic. But this is again caused by the historical dregs of the  x86 architecture, so I chose not to dive into it.
 
 \bcode
 zeropage->e820_entries = 2;
