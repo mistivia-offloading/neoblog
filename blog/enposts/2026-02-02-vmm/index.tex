@@ -180,8 +180,8 @@ Finally, we load the  kernel part of the  bzImage into memory at  1MB. To do thi
 \bcode
 setup_size = (zeropage->hdr.setup_sects + 1) * 512;
 memcpy(vm->memory + 0x100000,
-(char *)bz_image + setup_size,
-bz_image_size - setup_size);
+       (char*)bz_image + setup_size,
+       bz_image_size - setup_size);
 |ecode
 
 With this, the kernel loading is complete.
