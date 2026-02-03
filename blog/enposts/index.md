@@ -5,6 +5,7 @@ Archive
 
 Posts here are translated from Chinese to English using LLM.
 
+- 2026-02-02 [Write a VMM and Boot Linux](/enposts/2026-02-02-vmm/)
 - 2026-01-14 [Northwest Travelogue](/enposts/2026-01-14-nwtravel/)
 - 2026-01-12 [Curing Various Online Gaming Troubles](/enposts/2026-01-12-full-cone-nat/)
 - 2025-09-27 [EZLive: Easily Build a Private Live Streaming Room Without a Server](/enposts/2025-09-27-ezlive/)

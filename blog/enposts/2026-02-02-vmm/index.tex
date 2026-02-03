@@ -1,0 +1,333 @@
+%% Write a VMM and Boot Linux
+\input template-en.tex
+\title {Write a VMM and Boot Linux}
+\date {February 2, 2026}
+
+Recently, due to my interest in learning  eBPF, I came across the  \href{https://firecracker-microvm.github.io/}{Firecracker} Virtual Machine Manager (VMM). As a result, instead of doing my actual work, I fell down the rabbit hole of virtualization. Originally, my impression of VMMs was limited to behemoths like  QEMU and VMWare. However,  Firecracker made me realize that a VMM doesn't necessarily have to be that complex, so I started writing one myself.
+
+The final result is successfully booting the Linux kernel and running a  Busybox Shell, as shown below:
+
+\img{1.jpg}{0.75}
+
+The code is hosted on  \href{https://gist.github.com/mistivia/701ce77756b3dd5e39581be9c5a2c30b}{Gist}. The rest of this article will mainly focus on explaining this source code.
+
+I also referred to a lot of existing materials during the process, which will be listed at the end.
+
+\s {Creating the Virtual Machine}
+
+This step mainly involves using  {\itt ioctl} to call some  KVM interfaces. The code is located in the  {\itt vm\_guest\_init} function. There isn't much to introduce here, as it follows a standard pattern:
+
+\bli
+    \li {\itt KVM\_CREATE\_VM}: Create the Virtual Machine
+    \li {\itt KVM\_CREATE\_IRQCHIP}: Create the interrupt chip emulation
+    \li {\itt KVM\_CREATE\_PIT2}: Create the clock chip emulation
+    \li {\itt KVM\_SET\_USER\_MEMORY\_REGION}: Load memory allocated via  mmap
+    \li {\itt KVM\_CREATE\_VCPU}: Create a virtual  CPU
+\eli
+
+\s {CPU Initialization}
+
+Here we arrive at the first divergence point of this article. Our goal is to load and boot the  Linux kernel. Due to the infamous historical baggage of the  x86 architecture, the 64-bit  Linux kernel actually has 3 entry points, corresponding to  16-bit, 32-bit, and  64-bit modes. How to choose between them becomes a question.
+
+If we choose to start from the  16-bit entry point, it means we have to implement  BIOS emulation, which is tedious. If we start from the  64-bit entry point, we must first enter the  CPU's 64-bit mode. However, the  x86 CPU's 64-bit mode requires paging to be enabled, so we would also have to  create page tables first.
+
+In comparison, the 32-bit startup is much simpler; it does not require a BIOS, nor does it require creating page tables. Although our  Linux kernel is 64-bit, the  Linux kernel will handle the paging and the transition to 64-bit mode for us, so there is no need to worry. We are here to build a VMM, not a  bootloader or an operating system, so naturally, starting from the  32-bit entry point is the best choice.
+
+According to the  Linux kernel boot protocol, before the CPU jumps to the  32-bit kernel entry point, it needs to enter the 32-bit "flat mode". In this mode, the CPU runs in  32-bit mode but without paging, and all memory addresses are linearly mapped to physical memory.
+
+To enter this mode, on a real machine, there is a particularly complex initialization process. Details can be found on the  \href{https://wiki.osdev.org/GDT_Tutorial}{OSDev Wiki}. However, this is also purely historical dregs of the  x86 architecture and is not worth the effort. In short, by using the interfaces provided by  KVM, and setting the internal state of several segment registers and a special  cr0 register, we can make the virtual CPU enter the  32-bit flat mode:
+
+\bcode
+void set_flat_mode(struct kvm_segment *seg) {
+    seg->base = 0;
+    seg->limit = 0xffffffff;
+    seg->g = 1;
+    seg->db = 1;
+}
+|par |par
+struct kvm_sregs sregs;
+ioctl(cpu_fd, KVM_GET_SREGS, &sregs);
+set_flat_mode(&sregs.cs);
+set_flat_mode(&sregs.ds);
+set_flat_mode(&sregs.es);
+set_flat_mode(&sregs.fs);
+set_flat_mode(&sregs.gs);
+set_flat_mode(&sregs.ss);
+sregs.cr0 ||= 0x1;
+ioctl(cpu_fd, KVM_SET_SREGS, &sregs);
+|ecode
+
+Finally, the  rip register needs to be set to  0x100000. The kernel entry point will be loaded at this location later, and the  CPU will set sail from here. The  rsp register needs to be set to  0x10000, as the kernel boot parameters will be loaded at this position:
+
+\bcode
+struct kvm_regs regs;
+ioctl(cpu_fd, KVM_GET_REGS, &regs);
+regs.rip = 0x100000;
+regs.rsi = 0x10000;
+ioctl(cpu_fd, KVM_SET_REGS, &regs);
+|ecode
+
+The last step is to set the  CPUID. We get the  CPUID supported by  KVM from the  KVM API, and then set it to the virtual  CPU:
+
+\bcode
+struct kvm_cpuid2 *cpuid;
+int max_entries = 100;
+cpuid = malloc(sizeof(*cpuid) +
+max_entries * sizeof(struct kvm_cpuid_entry2));
+cpuid->nent = max_entries;
+ioctl(kvm_fd, KVM_GET_SUPPORTED_CPUID, cpuid)
+ioctl(cpu_fd, KVM_SET_CPUID2, cpuid)
+|ecode
+
+With this, the CPU initialization is complete; all that is missing is the kernel.
+
+\s {Loading the Kernel}
+
+To load the kernel, we first need to understand the layout of the kernel file. The file format of modern Linux kernels is called ``bzImage''. Traditionally, every  512 bytes on a disk is called a `sector''. The first  512 bytes of the Linux kernel are the boot sector used for starting from  16-bit mode. Then comes several sectors of startup parameters (setup). Only after that comes the real kernel. As shown below:
+
+\img{2.jpg}{0.8}
+
+The boot part is for  16-bit startup, which we can ignore. We only need to look at the latter two parts. According to the Linux kernel boot protocol, these steps must be completed when loading the kernel:
+
+\bli
+\li The first step in loading the  Linux kernel should be setting the boot parameters ({\itt boot\_params}, traditionally called ``Zero Page'').
+\li Load the  setup header starting from the kernel image offset  0x01f1 into  {\itt boot\_params} and check it.
+\li Set other fields in  {\itt boot\_params}.
+\li The \%esi register saves the address of  {\itt boot\_params}.
+\eli
+
+So first, let's map the kernel file (bzImage) into memory:
+
+\bcode
+bz_image = map_file(kernel_path, &bz_image_size);
+|ecode
+
+In the previous section, we set the  \%rsi register to  0x10000. Therefore, we will also set  {\itt struct boot\_params} at  0x10000 in memory and zero it out.
+
+\bcode
+zeropage = (struct boot_params *)(vm->memory + 0x10000);
+memset(zeropage, 0, sizeof(*zeropage));
+|ecode
+
+Load the  setup header starting at offset  0x01f1:
+
+\bcode
+memcpy(&zeropage->hdr, bz_image+0x01f1, sizeof(zeropage->hdr));
+|ecode
+
+We also need to find a free area in memory to store the command line parameters; here I chose  0x20000. We don't have a VGA display and can only use the serial port, so we set it to print via serial and enable debug display: ``console=ttyS0 debug''.
+
+\bcode
+#define KERNEL_ARGS "console=ttyS0 debug"
+cmd_line = (char *)(vm->memory + 0x20000);
+memcpy(cmd_line, KERNEL_ARGS, strlen(KERNEL_ARGS) + 1);
+|ecode
+
+Additionally, we might need to load an initial RAM disk (initrd) for initialization. The location of this  initrd is quite flexible; it can be placed anywhere as long as the kernel knows about it. Here, I chose to place it at  512 MB in memory. See the  {\itt load\_initrd} function:
+
+\bcode
+uint32_t initrd_addr = 0x20000000;
+memcpy(vm->memory + initrd_addr, initrd, st.st_size);
+|ecode
+
+Then we set the kernel boot parameters. First is the location of the command line arguments:
+
+\bcode
+zeropage->hdr.cmd_line_ptr = 0x20000;
+|ecode
+
+Set the graphics mode to the default  0xFFFF:
+
+\bcode
+zeropage->hdr.vid_mode = 0xFFFF;
+|ecode
+
+We didn't use a  bootloader but directly simulated the kernel loading process, so we can set the  bootloader field to an arbitrary value:
+
+\bcode
+zeropage->hdr.type_of_loader = 0xFF;
+|ecode
+
+Set the location of the RAM disk:
+
+\bcode
+zeropage->hdr.ramdisk_image = initrd_addr;
+zeropage->hdr.ramdisk_size = st.st_size;
+|ecode
+
+Tell the kernel that we loaded the kernel at  1MB:
+
+\bcode
+zeropage->hdr.loadflags ||= LOADED_HIGH;
+|ecode
+
+The most troublesome step is setting the memory layout. Here I chose to mark the regions  0-640KB and  1MB-1GB as available memory. As for why there must be a hole between  640KB and  1MB, I don't know either; I only found that setting it incorrectly might cause a  kernel panic. But this is again caused by the historical dregs of the  x86 architecture, so I chose not to dive into it.
+
+\bcode
+zeropage->e820_entries = 2;
+// first 640KB
+zeropage->e820_table[0].addr = 0;
+zeropage->e820_table[0].size = 0xA0000;
+zeropage->e820_table[0].type = 1;
+// > 1MB
+zeropage->e820_table[1].addr = 0x100000;
+zeropage->e820_table[1].size = MEM_SIZE - 0x100000;
+zeropage->e820_table[1].type = 1;
+|ecode
+
+Finally, we load the  kernel part of the  bzImage into memory at  1MB. To do this, we need to know the sizes of the boot and setup parts. Boot is fixed at  512 bytes. The size of  setup is at offset  0x01f1 of the kernel image, in units of sectors, where  1 sector is  512 bytes. Thus, we get the location of the  kernel:
+
+\bcode
+setup_size = (zeropage->hdr.setup_sects + 1) * 512;
+memcpy(vm->memory + 0x100000,
+(char *)bz_image + setup_size,
+bz_image_size - setup_size);
+|ecode
+
+With this, the kernel loading is complete.
+
+\s {Serial Port Emulation}
+
+Before the network device simulation is working, the serial port is our only way to interact with the virtual machine. The serial port can print kernel debug information and can also be used to launch a  shell. However, this section doesn't have much content because I was too lazy to read the hardware manuals, so I asked the  Kimi model to generate a barely usable serial port simulator for me. This serial simulator can only output content and cannot receive input. But at this stage, it is enough.
+
+The code related to serial simulation is in the  {\itt serial\_init} and  {\itt handle\_serial} functions. The initialization of the serial simulator needs to be done together with the creation of the virtual machine earlier.
+
+\s {Running the Virtual CPU}
+
+This section mainly involves the  {\itt vm\_run} function in the code.
+
+Before running the virtual  CPU, we first need to map a small piece of memory behind the virtual  CPU's file descriptor. The size of this memory is obtained via the  {\itt KVM\_GET\_VCPU\_MMAP\_SIZE} interface. This memory will be useful later when handling  IO and  MMIO:
+
+\bcode
+mmap_size = ioctl(vm->kvm_fd, KVM_GET_VCPU_MMAP_SIZE, 0);
+run = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE,
+MAP_SHARED, vm->cpu_fd, 0);
+|ecode
+
+After completing the memory mapping, we can run the virtual  CPU via the  {\itt KVM\_RUN} interface:
+
+\bcode
+ioctl(vm->cpu_fd, KVM_RUN, 0)
+|ecode
+
+However, the  CPU might exit after running for a while. The reasons can be as follows:
+
+\bli
+\li Virtual machine shutdown
+\li Virtual machine requests  IO
+\li Virtual machine requests Memory Mapped  IO (MMIO)
+\eli
+
+MMIO is essential for modern block devices and network devices, but we don't need it at this stage, so we ignore it all. And if we encounter an exit request, we just exit.
+
+As for  IO requests, this refers to the  \href{https://wiki.osdev.org/I/O_Ports}{IO ports} in x86 architecture. Most of them can also be directly ignored, but we need to handle the serial port requests. The memory mapped earlier from CPU fd will store  IO-related information. We check the port; if it is a port between  0x3f8 and  0x3ff, it indicates serial  IO, and we call  {\itt handle\_serial} to handle it:
+
+\bcode
+if (run->io.port >= 0x3f8 && run->io.port <= 0x3ff) {
+    handle_serial(vm, run);
+}
+|ecode
+
+\s {Creating the Busybox RAM Disk}
+
+First, install  Busybox:
+
+\bcode
+sudo pacman -S Busybox
+|ecode
+
+Then create a  rootfs directory:
+
+\bcode
+mkdir rootfs
+|ecode
+
+Then create some necessary directories:
+
+\bcode
+cd rootfs
+mkdir dev sys proc bin
+|ecode
+
+Then install  Busybox into this directory:
+
+\bcode
+busybox --install bin/
+|ecode
+
+Then create an  init script:
+
+\bcode
+#!/bin/sh
+|par |par
+mount -t devtmpfs devtmpfs /dev
+mount -t proc proc /proc
+mount -t sysfs sys /sys
+mdev -s
+|par |par
+echo "BusyBox!"
+/bin/sh -l
+|par |par
+while : ; do
+sleep 1
+done
+|ecode
+
+Set this  init script as executable, and then package the entire directory into a  cpio image:
+
+\bcode
+chmod +x init
+find . -print0 || cpio --null -ov --format=newc || gzip > ../initrd
+|ecode
+
+This way, we get our initial RAM disk: the initrd file.
+
+\s {Wrapping Up}
+
+Now we can get the virtual machine running. First, grab a kernel from the local machine:
+
+\bcode
+cp /boot/vmlinuz-linux ./vmlinuz
+|ecode
+
+The name of the kernel file might differ across distributions, but it should be roughly the same.
+
+Then compile the VMM code:
+
+\bcode
+gcc small_vmm.c -o small_vmm
+|ecode
+
+Finally run it:
+
+\bcode
+sudo ./small_vmm vmlinuz initrd
+|ecode
+
+If everything goes smoothly, you will be able to see the  Busybox shell prompt just like in the picture at the beginning. However, inputting commands and pressing enter will have no reaction because the serial simulation is not fully implemented yet and lacks serial input functionality. You can only exit by pressing  Ctrl+C.
+
+\s {Summary}
+
+Our Virtual Machine Manager story ends here for now. As for the next steps, naturally, the first thing is to fully implement the serial simulation so that we can input on the console. For this, reading the manuals and data sheets for the  8250 chip might be necessary.
+
+Then comes implementing the simulation of  Virtual IO devices, which requires referring to \href{https://docs.oasis-open.org/virtio/virtio/v1.0/virtio-v1.0.html}{this document}. A complete implementation would require simulating a  PCI bus, but  Linux provides a command-line argument that allows us to tell the kernel the  MMIO memory address mapped to  Virtual IO directly via the kernel command line parameters, without needing a  PCI bus. This significantly reduces the workload.
+
+Finally, to make this VMM support multi-processors, there is also some extra work to be done.
+
+At this stage, this VMM has no practical use. But on the other hand, this VMM is not far from being practically useful. Just by adding block device and network device simulations, it can fully be used to deploy some backend applications that need environmental isolation; deploying things like  OpenClaw would also be feasible.
+
+In computer science, if  App development, frontend, and CRUD backend are the ``Exoteric'' teachings, then some lower-level computer fields are all ``Esoteric'' teachings: although they are not actually very difficult things, a lot of knowledge in their nich area relies on asking an expert for help or reading source code. Sometimes even the strongest  AI struggles to give good answers. Although virtualization is considered a mainstream technology, when it comes to specific details, it becomes something closer to ``Esoteric''. This is my motivation for writing this article.
+
+\s {References}
+
+\bli
+    \li \href{https://www.kernel.org/doc/html/v6.1/x86/boot.html}{The Linux/x86 Boot Protocol}
+    \li \href{https://docs.kernel.org/virt/kvm/api.html}{The Definitive KVM API Documentation}
+    \li \href{https://wdv4758h.github.io/notes/blog/linux-kernel-boot.html}{Linux Kernel Boot}
+    \li \href{https://www.ihcblog.com/rust-mini-vmm-1/}{Implementing a Minimal  VMM in Rust - Ihcblog!}
+    \li \href{https://docs.kernel.org/admin-guide/kernel-parameters.html}{The kernel’s command-line parameters}
+    \li \href{https://gist.github.com/zserge/ae9098a75b2b83a1299d19b79b5fe488}{kvm\_host.c - GitHub Gist}
+    \li \href{https://github.com/rust-vmm/vmm-reference/}{vmm-reference - GitHub}
+\eli
+
+\bye

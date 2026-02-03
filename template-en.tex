@@ -5,20 +5,23 @@
 \hoffset = -10.4mm
 \voffset = -10.4mm
 
+\font\zh="KingHwa_OldSong" at 11pt
 \font\entitle=cmb10 at 25pt
 \font\eni=cmb10 at 18pt
 \font\enii=cmb10 at 15pt
 \font\eniii=cmb10 at 12pt
 \font\en=cmr10 at 11pt
-\font\mytt=cmtt10 at 10pt
+\font\itt=cmtt10 at 11pt
+\font\mytt=cmtt10 at 8pt
 \footline={\hss\en\folio\hss}
 \en
 
 \baselineskip=16pt
 \parindent=2.1em
 \raggedbottom
-% \emergencystretch=1em
-% \tolerance=2000
+\emergencystretch=1em
+\tolerance=2000
+\overfullrule=0pt
 % \parskip=1mm
 
 \def\title#1{\centerline{\parindent=0mm\entitle #1}\vskip 3mm}
@@ -28,11 +31,12 @@
 \def\sss#1{\vskip 5mm{\parindent=0mm \eniii #1}\vskip 2mm}
 \def\lcurly{\char123}
 \def\vbar{\char124}
+\def\|{\char124}
 \def\rcurly{\char125}
-\def\li{\item{•}}
-\def\bli{\vskip 5pt\baselineskip=11pt}
+\def\li{\item{\zh •}}
+\def\bli{\vskip 5pt\baselineskip=13pt}
 \def\eli{\vskip 5pt\baselineskip=16pt}
-\def\img#1#2{\centerline{\XeTeXpicfile "#1" width #2\hsize}}
+\def\img#1#2{\vskip 3mm \centerline{\XeTeXpicfile "#1" width #2\hsize} \vskip 3mm}
 \def\sp{\thinspace}
 
 \def\makeother#1{\catcode`#1=12 }
@@ -53,7 +57,7 @@
 {\obeyspaces\global\let =\ } 
 \def\bcode{
   \begingroup
-  \vskip 5pt
+  \vskip 7pt
   \baselineskip=12pt
   \setupverbatim
   \catcode`\|=0  % set | to special
@@ -61,7 +65,7 @@
   \verbatimcontent
 }
 \def\verbatimcontent{} 
-\def\ecode{\endgroup\vskip 5pt}
+\def\ecode{\endgroup\vskip 7pt}
 
 \def\href#1#2{%
   \special{html:<a href="#1">}%
