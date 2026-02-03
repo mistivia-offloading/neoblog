@@ -1,11 +1,11 @@
-%% 从零开始的虚拟机管理器
+%% 写一个虚拟机管理器
 \input template.tex
-\title {从零开始的虚拟机管理器}
+\title {写一个虚拟机管理器}
 \date {2026\sp 年\sp 2\sp 月\sp 2\sp 日}
 
-最近因为想学\sp eBPF\sp 的关系，接触到了\sp Firecracker\sp 这个虚拟机管理器，结果正事没干一头拐进了虚拟化的坑里。本来我对虚拟机管理器的印象都是\sp QEMU、VMWare\sp 之类的庞然大物，不过\sp Firecracker\sp 突然让我发现虚拟机管理器其实也不见得非得这么复杂，于是就萌生了自己做一个虚拟机管理器的想法。
+最近因为想学\sp eBPF\sp 的关系，接触到了\sp \href{https://firecracker-microvm.github.io/}{Firecracker}\sp 这个虚拟机管理器，结果正事没干一头拐进了虚拟化的坑里。本来我对虚拟机管理器的印象都是\sp QEMU、VMWare\sp 之类的庞然大物，不过\sp Firecracker\sp 突然让我发现虚拟机管理器其实也不见得非得这么复杂，于是就萌生了自己做一个虚拟机管理器的想法。
 
-最后的成果是成功进入了\sp Busybox\sp 的\sp Shell，如下图：
+最后的成果是成功启动了Linux内核，并成功运行了\sp Busybox\sp 的\sp Shell，如下图：
 
 \img{1.jpg}{0.75}
 
@@ -33,9 +33,9 @@
 
 相比之下，32\sp 位启动就简单多了，不需要BIOS。也不要求创建页表。虽然我们的\sp Linux\sp 内核是\sp 64\sp 位的，但是\sp Linux\sp 内核会帮我们处理好分页并进入64位模式，并不需要担心。我们是来做虚拟机管理器的，不是来做\sp bootloader\sp 和操作系统的，所以自然，从\sp 32\sp 位启动点启动是最好的选择。
 
-根据\sp Linux\sp 内核的启动协议，CPU\sp 在跳转到\sp 32\sp 位内核启动点之前，需要进入32位的“平坦模式”，在这个模式下，CPU\sp 在\sp 32\sp 位模式中运行，没有没有分页，所有内存地址均直接映射到物理内存。
+根据\sp Linux\sp 内核的启动协议，CPU\sp 在跳转到\sp 32\sp 位内核启动点之前，需要进入32位的“平坦模式”，在这个模式下，CPU\sp 在\sp 32\sp 位模式中运行，但是却没有分页，所有内存地址均直接映射到物理内存。
 
-为了进入这个模式，在实际的机器中，有一个特别复杂的初始化流程。具体可以查看\sp \href{https://wiki.osdev.org/GDT_Tutorial}{OSDev Wiki}，但是这个也完全是\sp x86\sp 架构的历史糟粕，并不值得耗费心力。总之，利用\sp KVM\sp 提供的接口，设置若干个段寄存器和一个特殊的\sp cr0\sp 寄存器的内部状态，就可以进入\sp 32\sp 位平坦模式了：
+为了进入这个模式，在实际的机器中，有一个特别复杂的初始化流程。具体可以查看\sp \href{https://wiki.osdev.org/GDT_Tutorial}{OSDev Wiki}。但是这个也完全是\sp x86\sp 架构的历史糟粕，并不值得耗费心力。总之，利用\sp KVM\sp 提供的接口，设置若干个段寄存器和一个特殊的\sp cr0\sp 寄存器的内部状态，我们就可以让虚拟CPU进入\sp 32\sp 位平坦模式了：
 
 \bcode
 void set_flat_mode(struct kvm_segment *seg) {
@@ -44,7 +44,7 @@ void set_flat_mode(struct kvm_segment *seg) {
     seg->g = 1;
     seg->db = 1;
 }
-
+|par |par
 struct kvm_sregs sregs;
 ioctl(cpu_fd, KVM_GET_SREGS, &sregs);
 set_flat_mode(&sregs.cs);
@@ -53,7 +53,7 @@ set_flat_mode(&sregs.es);
 set_flat_mode(&sregs.fs);
 set_flat_mode(&sregs.gs);
 set_flat_mode(&sregs.ss);
-sregs.cr0 |vbar= 0x1;
+sregs.cr0 ||= 0x1;
 ioctl(cpu_fd, KVM_SET_SREGS, &sregs);
 |ecode
 
@@ -81,31 +81,164 @@ ioctl(kvm_fd, KVM_GET_SUPPORTED_CPUID, cpuid)
 ioctl(cpu_fd, KVM_SET_CPUID2, cpuid)
 |ecode
 
-这样，CPU\sp 初始化完毕，只欠东风。
+这样，CPU\sp 初始化完毕，只欠内核。
 
 \s {加载内核}
 
-TODO
+要加载内核，首先我们要知道内核文件的布局。现代Linux内核的文件模式叫做“bzImage”。传统上，磁盘上的每\sp 512\sp 字节被称为一个“扇区”。Linux内核上最开始的\sp 512\sp 字节就是用于从\sp 16\sp 位模式启动的启动扇区（boot）。然后是若干个扇区的启动参数（setup）。再然后才是真正的内核（kernel）。如下图：
+
+\img{2.jpg}{0.8}
+
+其中，boot\sp 部分是用于\sp 16\sp 位启动的，我们不需要理会。我们只需要看后两部分。根据Linux内核的启动协议，内核加载时需要完成这些步骤：
+
+\bli
+    \li 加载\sp Linux\sp 内核的第一步应该是设置启动参数（{\itt boot\_params}，传统上称为“Zero Page”）
+    \li 将内核映像偏移量\sp 0x01f1\sp 开始的\sp setup\sp 头部加载到\sp {\itt boot\_params}\sp 中并进行检查
+    \li 设置\sp {\itt boot\_params}\sp 中的其他字段
+    \li \%esi寄存器保存\sp {\itt boot\_params}\sp 的地址
+\eli
+
+那么我们首先把内核文件（bzImage）映射到内存中：
+
+\bcode
+bz_image = map_file(kernel_path, &bz_image_size);
+|ecode
+
+在上一节中，我们把\sp \%rsi\sp 寄存器设置为了\sp 0x10000，因此，我们也会把\sp {\itt struct boot\_params}\sp 设置到内存中的\sp 0x10000\sp 处并清零。
+
+\bcode
+zeropage = (struct boot_params *)(vm->memory + 0x10000);
+memset(zeropage, 0, sizeof(*zeropage));
+|ecode
+
+加载偏移量\sp 0x01f1\sp 开始的\sp setup\sp 头部：
+
+\bcode
+memcpy(&zeropage->hdr, bz_image+0x01f1, sizeof(zeropage->hdr));
+|ecode
+
+我们还需要在内存中随便找一块空闲的位置存放命令行参数，这里我选了\sp 0x20000。我们没有VGA显示，只能用串口，所以设置一下用串口打印，并且开启debug显示：“console=ttyS0 debug”。
+
+\bcode
+#define KERNEL_ARGS "console=ttyS0 debug"
+cmd_line = (char *)(vm->memory + 0x20000);
+memcpy(cmd_line, KERNEL_ARGS, strlen(KERNEL_ARGS) + 1);
+|ecode
+
+此外，我们可能还需要加载一个用于初始化的内存虚拟盘（initrd）。这个\sp initrd\sp 的位置就比较宽松了，随便放什么地方都可以，只要内核能知道就行。这里我选择放在内存的\sp 512 MB\sp 处。参见\sp {\itt load\_initrd} 函数：
+
+\bcode
+uint32_t initrd_addr = 0x20000000;
+memcpy(vm->memory + initrd_addr, initrd, st.st_size);
+|ecode
+
+然后我们设置一下内核的启动参数。首先是命令行参数的位置：
+
+\bcode
+zeropage->hdr.cmd_line_ptr = 0x20000;
+|ecode
+
+图形模式设置位默认的\sp 0xFFFF：
+
+\bcode
+zeropage->hdr.vid_mode = 0xFFFF;
+|ecode
+
+我们没用到\sp bootloader，而是直接模拟了内核加载过程，所以\sp bootloader 字段随便设一个：
+
+\bcode
+zeropage->hdr.type_of_loader = 0xFF;
+|ecode
+
+设置内存虚拟盘的位置：
+
+\bcode
+zeropage->hdr.ramdisk_image = initrd_addr;
+zeropage->hdr.ramdisk_size = st.st_size;
+|ecode
+
+告诉内核，我们加载内核的位置是\sp 1MB\sp 处：
+
+\bcode
+zeropage->hdr.loadflags ||= LOADED_HIGH;
+|ecode
+
+最麻烦的一步是设置内存布局，这里我选择的是把\sp 0-640KB\sp 和\sp 1MB-1GB\sp 这两个区域标记为可用内存。至于为什么\sp 640KB\sp 到\sp 1MB\sp 之间要留个空洞，我也不知道，我只发现如果设置错误可能会\sp kernel panic。不过这又是\sp x86\sp 架构的历史包袱造成的，我选择不去深究。
+
+\bcode
+zeropage->e820_entries = 2;
+// first 640KB
+zeropage->e820_table[0].addr = 0;
+zeropage->e820_table[0].size = 0xA0000;
+zeropage->e820_table[0].type = 1;
+// > 1MB
+zeropage->e820_table[1].addr = 0x100000;
+zeropage->e820_table[1].size = MEM_SIZE - 0x100000;
+zeropage->e820_table[1].type = 1;
+|ecode
+
+最后，我们把\sp bzImage\sp 中的\sp kernel\sp 部分加载到内存中的\sp 1MB\sp 处。为此，我们需要知道boot和setup部分的大小，boot\sp 固定是\sp 512\sp 字节，setup\sp 的大小，在内核映像偏移量\sp 0x01f1\sp 处，单位是扇区，而\sp 1\sp 扇区是\sp 512\sp 字节。因此，我们得到\sp kernel\sp 的位置：
+
+\bcode
+setup_size = (zeropage->hdr.setup_sects + 1) * 512;
+memcpy(vm->memory + 0x100000,
+       (char *)bz_image + setup_size,
+       bz_image_size - setup_size);
+|ecode
+
+这样，内核加载完毕。
 
 \s {串口模拟}
 
-这一节没有什么内容，因为懒得读硬件手册，所以我让\sp Kimi\sp 模型给我生成了一个凑合能用的串口模拟程序。这个串口模拟器只能输出内容，无法接收输入。不过在现在这个阶段已经够了。
+在网络设备模拟器调通以前，串口是我们和虚拟机交互的唯一方式，串口可以打印内核的调试信息，也可以用来启动\sp shell。不过这一节没有什么内容，因为懒得读硬件手册，所以我让\sp Kimi\sp 模型给我生成了一个凑合能用的串口模拟程序。这个串口模拟器只能输出内容，无法接收输入。不过在现在这个阶段已经够了。
 
 串口模拟相关的代码在\sp {\itt serial\_init}\sp 和\sp {\itt handle\_serial}\sp 这两个函数中。串口模拟器的初始化需要在前面创建虚拟机的时候一并完成。
 
 \s {运行虚拟\sp CPU}
 
-TODO
+这一节主要涉及代码中的\sp {\itt vm\_run}\sp 函数。
+
+在运行虚拟\sp CPU\sp 之前，首先需要把虚拟\sp CPU\sp 的文件描述符后面的一小段内存映射出来。而这段内存的大小是通过\sp {\itt KVM\_GET\_VCPU\_MMAP\_SIZE} 接口获得的。这段内存在后面处理\sp IO\sp 和\sp MMIO\sp 的时候会有用处：
+
+\bcode
+mmap_size = ioctl(vm->kvm_fd, KVM_GET_VCPU_MMAP_SIZE, 0);
+run = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE,
+           MAP_SHARED, vm->cpu_fd, 0);
+|ecode
+
+完成内存映射之后，就可以通过\sp {\itt KVM\_RUN}\sp 接口运行虚拟\sp CPU：
+
+\bcode
+ioctl(vm->cpu_fd, KVM_RUN, 0)
+|ecode
+
+但是\sp CPU\sp 运行一段时间之后可能会退出。原因有以下几种：
+
+\bli
+    \li 虚拟机关闭
+    \li 虚拟机请求\sp IO
+    \li 虚拟机请求内存映射\sp IO（MMIO）
+\eli
+
+MMIO\sp 对于现代的块设备和网络设备必不可少，但是现阶段我们用不到，所以全部忽略。而碰到退出请求直接退出就好。
+
+至于\sp IO\sp 请求，这里指的是\sp x86\sp 架构中的\sp \href{https://wiki.osdev.org/I/O_Ports}{IO port}，大部分也是可以直接忽略的，但是串口的请求我们需要处理一下。之前映射的内存里面会存放\sp IO\sp 相关的信息。我们查看其端口，如果是\sp 0x3f8\sp 到\sp 0x3ff\sp 之间的端口，说明是串口\sp IO，我们调用\sp {\itt handle\_serial}\sp 处理：
+
+\bcode
+if (run->io.port >= 0x3f8 && run->io.port <= 0x3ff) {
+    handle_serial(vm, run);
+}
+|ecode
 
 \s {创建\sp Busybox\sp 内存虚拟盘}
 
-首先安装Busybox:
+首先安装\sp Busybox:
 
 \bcode
 sudo pacman -S Busybox
 |ecode
 
-然后创建一个rootfs目录：
+然后创建一个\sp rootfs\sp 目录：
 
 \bcode
 mkdir rootfs
@@ -118,44 +251,42 @@ cd rootfs
 mkdir dev sys proc bin
 |ecode
 
-然后把Busybox安装到这个目录里面：
+然后把\sp Busybox\sp 安装到这个目录里面：
 
 \bcode
 busybox --install bin/
 |ecode
 
-然后创建一个init脚本：
+然后创建一个\sp init\sp 脚本：
 
 \bcode
 #!/bin/sh
-|sp
+|par |par
 mount -t devtmpfs devtmpfs /dev
 mount -t proc proc /proc
 mount -t sysfs sys /sys
 mdev -s
-|sp
+|par |par
 echo "BusyBox!"
 /bin/sh -l
-|sp
+|par |par
 while : ; do
     sleep 1
 done
 |ecode
 
-
-把这个init脚本设置为可运行，然后把整个目录打包成一个cpio镜像：
+把这个\sp init\sp 脚本设置为可运行，然后把整个目录打包成一个\sp cpio\sp 镜像：
 
 \bcode
 chmod +x init
-find . -print0 |vbar cpio --null -ov --format=newc |vbar gzip > ../initrd
+find . -print0 || cpio --null -ov --format=newc || gzip > ../initrd
 |ecode
 
-这样我们就得到了我们的初始化虚拟盘：initrd文件。
-
+这样我们就得到了我们的初始化虚拟盘：initrd\sp 文件。
 
 \s {收官}
 
-最后就是见证奇迹的时刻了。首先从Linux本机薅一个内核出来：
+这个时候我们就可以把虚拟机跑起来了。首先从本机薅一个内核出来：
 
 \bcode
 cp /boot/vmlinuz-linux ./vmlinuz
@@ -175,21 +306,21 @@ gcc small_vmm.c -o small_vmm
 sudo ./small_vmm vmlinuz initrd
 |ecode
 
-如果顺利的话，就能像开头那张图一样，看到Busybox的Shell提示符。不过输入命令和按回车都是没有反应的，因为前面没有完整实现串口模拟，没有做串口输入的功能。只能按Ctrl+C退出。
+如果顺利的话，就能像开头那张图一样，看到\sp Busybox\sp 的\sp shell\sp 提示符。不过输入命令和按回车都是没有反应的，因为前面没有完整实现串口模拟，没有做串口输入的功能。只能按\sp Ctrl+C\sp 退出。
+
+\vfill\eject
 
 \s {小结}
 
-虽然
+到这里我们的虚拟机管理器就告一段落了。至于下一步，首先自然是要把串口模拟完整做出来，这样就可以在控制台上输入，为此可能需要阅读\sp 8250\sp 芯片的手册和资料。
 
-但是另一方面，这个虚拟机管理器距离有实际用途却也并不遥远。
+然后就是实现\sp Virtual IO\sp 设备的模拟了，需要参考\href{https://docs.oasis-open.org/virtio/virtio/v1.0/virtio-v1.0.html}{这份文档}。完整的实现需要模拟\sp PCI\sp 总线，但是\sp Linux\sp 提供了一个命令行参数，我们可以直接把\sp Virtual IO\sp 映射的\sp MMIO\sp 内存地址通过内核命令行参数直接告诉内核，而无需通过\sp PCI\sp 总线，这样就大大降低了开发工作量。
 
-如果说\sp App\sp 开发、前端、CRUD\sp 后端这些是“显宗”的话，一些比较底层的计算机领域，就全是“密宗”了：虽然实际上并不是很难的东西，但是因为比较小众，很多知识只能依赖口耳相传和啃源代码，甚至有时候连最强的\sp AI\sp 也难以给出良好的解答。虚拟化虽然也算是个很大众的技术了，但是具体到一些细节，就又变成了一个比较接近“密宗”的东西。这也是我写这篇文章的动机。
+最后，为了让这个虚拟机管理器能够支持多处理器，也还有一段额外的工作量。
 
-\s {下一步计划}
+现阶段这个虚拟机管理器自然是没法使用的。但是另一方面，这个虚拟机管理器距离有实际用途却也并不遥远。只要再加上块设备和网络设备模拟程序，就完全可以用来部署一些需要环境隔离的后端应用了，用于部署\sp clawdbot\sp 之类的东西也都可行。
 
-至于下一步，首先自然是要把串口模拟完整做出来，这样就可以在控制台上输入，为此可能需要阅读\sp 8250\sp 芯片的手册和资料。
-
-然后就是实现\sp Virual IO\sp 设备的模拟了，需要参考\href{https://docs.oasis-open.org/virtio/virtio/v1.0/virtio-v1.0.html}{这份文档}。
+如果说\sp App\sp 开发、前端、CRUD\sp 后端这些是“显宗”的话，一些比较底层的计算机领域，就全是“密宗”了：虽然实际上并不是很难的东西，但是因为比较小众，很多知识只能依赖口耳相传和啃源代码获得，甚至有时候连最强的\sp AI\sp 也难以给出良好的解答。虚拟化虽然也算是个很大众的技术了，但是具体到一些细节，就又变成了一个比较接近“密宗”的东西。这也是我写这篇文章的动机。
 
 \s {参考资料}
 

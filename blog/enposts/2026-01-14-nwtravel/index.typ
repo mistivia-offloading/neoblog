@@ -8,9 +8,9 @@ body: [
 
 #set heading(numbering: none)
 
-In early December, I took a trip to the northwestern provinces, mainly Xi'an and Linfen in Shanxi (although Shanxi is more often categorized as North China). The Seagull 4B TLR camera I bought earlier had never been used, except for a few black-and-white film photos taken around the West Lake and near my residence. This trip also happened to be the first time I used color film for photography.
+In early December, I took a trip to the northwestern provinces, mainly Xi'an and Linfen in Shanxi (although Shanxi is more often categorized as North China). The Seagull 4B TLR camera I bought earlier had never been used, except for a few black-and-white film photos taken around the West Lake and near my residence. So it's a good chance to use it this time. This trip also happened to be the first time I used color film for photography.
 
-As for the mode of travel, because my power bank is quite old and lacks 3C certification, and I didn't want the film to pass through X-ray machines, I still chose to travel by high-speed rail. The whole train journey took eight hours, crossing the Yangtze River and the Yellow River, passing through the Central Plains, and entering the Guanzhong Basin through the Hangu Pass. It can be said to be a classic "entering the pass" route. Finally, I arrived at Xi'an North Railway Station at dusk.
+As for the transpotation of travel, because my power bank is quite old and lacks 3C certification, and I didn't want the film to pass through X-ray machines, I still chose to travel by high-speed rail. The whole train journey took 8 hours, crossing the Yangtze River and the Yellow River, passing through the Central Plains, and entering the Guanzhong Basin through the Hangu Pass. It can be said to be a classic "entering the pass" route. Finally, I arrived at Xi'an North Railway Station at dusk.
 
 At first, I thought Xi'an would be quite cold, but having not been to the north for a long time, I had forgotten that the dry cold here is not very scary. Down jackets were almost completely unnecessary. The homestay I booked was in a place called "Nanshaomen," which is relatively close to some nearby attractions. After meeting up with Silicon Neko at the subway station, we ate ice-boiled mutton hot pot nearby. The first day of travel exhaustion ended there.
 
@@ -18,11 +18,11 @@ At first, I thought Xi'an would be quite cold, but having not been to the north 
 
 On this day, I originally wanted to visit the Xi'an Museum and the Shaanxi History Museum, but I couldn't make it because the reservations were full. So after lunch, I chose to go straight to the Xi'an City Wall.
 
-The Xi'an City Wall is quite expensive, costing more than fifty yuan. However, after going up the wall, I found that there was actually not much content. It was mainly for walking and feeling the historical atmosphere.
+The entrance ticket of Xi'an City Wall is quite expensive, costing more than fifty yuan. However, after going up the wall, I found that there was actually not much to see. It was mainly for walking and feeling the historical atmosphere.
 
 #image("001.jpg", width: 65%)
 
-There were many tourists taking photos in Hanfu (traditional Han clothing) on the city wall, very lively. Among the tourists taking photos in Hanfu were both men and women, but the Hanfu for men often looked a bit like something out of a xianxia TV drama, which was very inconsistent with the simple style of the city wall, making it a bit distracting.
+There were many tourists taking photos in Hanfu (traditional Han clothing) on the city wall. Among the tourists taking photos in Hanfu were both men and women, but the Hanfu for men often looked a bit like something out of a xianxia TV drama, which was very inconsistent with the ancient style of the city wall, making it a bit distracting.
 
 #image("002.jpg", width: 65%)
 
@@ -30,11 +30,11 @@ The current Xi'an City Wall is a Ming Dynasty wall, and the Ming Dynasty wall wa
 
 #image("003.jpg", width: 65%)
 
-After coming down from the wall, two subway stops took me to the Bell and Drum Towers, which should be considered the center of Xi'an. The Bell Tower is quite beautiful, but I made a small mistake when operating the camera, resulting in a double exposure, leaving only a shadow of the Bell Tower.
+After coming down from the wall, two subways stops away are the Bell and Drum Towers, which should be considered the center of Xi'an. The Bell Tower is quite beautiful, but I made a small mistake when operating the camera, resulting in a double exposure, leaving only a shadow of the Bell Tower.
 
 #image("004.jpg", width: 65%)
 
-After dinner in the evening, I wandered around the Bell Tower area. Silicon Neko saw a horror-themed escape room experience hall and suggested we try it. Then, as expected, I was so scared that I was still shaking long after I came out. Because I don't like this kind of horror experience, I don't want to recall it much. But to be honest, their experience effects were indeed very powerful. I can understand why many people just love playing this.
+After dinner in the evening, I wandered around the Bell Tower area. Silicon Neko saw a horror-themed escape room experience hall and suggested we try it. Then, as expected, I was so scared that I was still shaking long after I came out. Because I don't like this kind of horror experience, I don't want to recall it much. But to be honest, their horror effects were indeed very powerful. I can understand why many people just love this.
 
 That's how the first day went.
 
@@ -42,7 +42,7 @@ That's how the first day went.
 
 The main arrangement for this day was to visit the Emperor Qinshihuang's Mausoleum Site Museum (Terracotta Warriors). Taking a lesson from yesterday's failure to book museum tickets, I made a reservation early this time. However, the Terracotta Warriors tickets did not seem to be in very high demand; a reservation was not actually needed.
 
-The market for paid guided tours of the Terracotta Warriors is very competitive. From the moment you get off the subway and get on the bus, various organizations begin to promote guided tours. However, the most authoritative explanation should be from the museum staff at the entrance of Pit 1. Pit 1 is the most classic Terracotta Warriors pit, with an atmosphere of thousands of troops and horses:
+The market for paid guided tours of the Terracotta Warriors is very competitive. From the moment you get off the subway and get on the bus, various organizations begin to promote guided tours. However, the most authentic guided tour should be from the museum staff at the entrance of Pit 1. Pit 1 is the most classic Terracotta Warriors pit, with an atmosphere of thousands of troops and horses:
 
 #image("005.jpg", width: 65%)
 
