@@ -5,7 +5,7 @@
 
 Recently, due to my interest in learning  eBPF, I came across the  \href{https://firecracker-microvm.github.io/}{Firecracker} Virtual Machine Manager (VMM). As a result, instead of doing my actual work, I fell down the rabbit hole of virtualization. Originally, my impression of VMMs was limited to behemoths like  QEMU and VMWare. However,  Firecracker made me realize that a VMM doesn't necessarily have to be that complex, so I started writing one myself.
 
-The final result is successfully booting the Linux kernel and running a  Busybox Shell, as shown below:
+The final result is successfully booting the Linux kernel and running a  BusyBox Shell, as shown below:
 
 \img{1.jpg}{0.75}
 
@@ -228,12 +228,12 @@ if (run->io.port >= 0x3f8 && run->io.port <= 0x3ff) {
 }
 |ecode
 
-\s {Creating the Busybox RAM Disk}
+\s {Creating the BusyBox RAM Disk}
 
-First, install  Busybox:
+First, install  BusyBox:
 
 \bcode
-sudo pacman -S Busybox
+sudo pacman -S BusyBox
 |ecode
 
 Then create a  rootfs directory:
@@ -249,10 +249,10 @@ cd rootfs
 mkdir dev sys proc bin
 |ecode
 
-Then install  Busybox into this directory:
+Then install  BusyBox into this directory:
 
 \bcode
-busybox --install bin/
+BusyBox --install bin/
 |ecode
 
 Then create an  init script:
@@ -304,7 +304,7 @@ Finally run it:
 sudo ./small_vmm vmlinuz initrd
 |ecode
 
-If everything goes smoothly, you will be able to see the  Busybox shell prompt just like in the picture at the beginning. However, inputting commands and pressing enter will have no reaction because the serial simulation is not fully implemented yet and lacks serial input functionality. You can only exit by pressing  Ctrl+C.
+If everything goes smoothly, you will be able to see the  BusyBox shell prompt just like in the picture at the beginning. However, inputting commands and pressing enter will have no reaction because the serial simulation is not fully implemented yet and lacks serial input functionality. You can only exit by pressing  Ctrl+C.
 
 \s {Summary}
 

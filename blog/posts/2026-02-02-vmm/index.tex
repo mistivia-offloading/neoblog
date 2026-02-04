@@ -5,7 +5,7 @@
 
 最近因为想学\sp eBPF\sp 的关系，接触到了\sp \href{https://firecracker-microvm.github.io/}{Firecracker}\sp 这个虚拟机管理器，结果正事没干一头拐进了虚拟化的坑里。本来我对虚拟机管理器的印象都是\sp QEMU、VMWare\sp 之类的庞然大物，不过\sp Firecracker\sp 突然让我发现虚拟机管理器其实也不见得非得这么复杂，于是就萌生了自己做一个虚拟机管理器的想法。
 
-最后的成果是成功启动了Linux内核，并成功运行了\sp Busybox\sp 的\sp Shell，如下图：
+最后的成果是成功启动了Linux内核，并成功运行了\sp BusyBox\sp 的\sp Shell，如下图：
 
 \img{1.jpg}{0.75}
 
@@ -230,12 +230,12 @@ if (run->io.port >= 0x3f8 && run->io.port <= 0x3ff) {
 }
 |ecode
 
-\s {创建\sp Busybox\sp 内存虚拟盘}
+\s {创建\sp BusyBox\sp 内存虚拟盘}
 
-首先安装\sp Busybox:
+首先安装\sp BusyBox:
 
 \bcode
-sudo pacman -S Busybox
+sudo pacman -S BusyBox
 |ecode
 
 然后创建一个\sp rootfs\sp 目录：
@@ -251,10 +251,10 @@ cd rootfs
 mkdir dev sys proc bin
 |ecode
 
-然后把\sp Busybox\sp 安装到这个目录里面：
+然后把\sp BusyBox\sp 安装到这个目录里面：
 
 \bcode
-busybox --install bin/
+BusyBox --install bin/
 |ecode
 
 然后创建一个\sp init\sp 脚本：
@@ -306,7 +306,7 @@ gcc small_vmm.c -o small_vmm
 sudo ./small_vmm vmlinuz initrd
 |ecode
 
-如果顺利的话，就能像开头那张图一样，看到\sp Busybox\sp 的\sp shell\sp 提示符。不过输入命令和按回车都是没有反应的，因为前面没有完整实现串口模拟，没有做串口输入的功能。只能按\sp Ctrl+C\sp 退出。
+如果顺利的话，就能像开头那张图一样，看到\sp BusyBox\sp 的\sp shell\sp 提示符。不过输入命令和按回车都是没有反应的，因为前面没有完整实现串口模拟，没有做串口输入的功能。只能按\sp Ctrl+C\sp 退出。
 
 \vfill\eject
 
