@@ -2,7 +2,7 @@
 #import "/template-en.typ": *
 #doc-template(
 title: "Study Notes for Amateur Radio Station Operation Technical Capability Verification",
-date: "March 16th, 2019",
+date: "March 16, 2019",
 body: [
 
 I previously took the exam for the amateur radio operation certificate. It's actually quite easy to pass because there are only 370 multiple-choice questions. Since the question bank only contains questions, making it difficult to memorize systematically, I have organized it slightly.

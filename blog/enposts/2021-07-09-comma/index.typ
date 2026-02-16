@@ -3,7 +3,7 @@
 
 #doc-template(
   title: "The Oxford Comma in Chinese",
-  date: "July 9th, 2021",
+  date: "July 9, 2021",
   body: [
 
     In English, if you are listing a series of things, it is usually written like this:

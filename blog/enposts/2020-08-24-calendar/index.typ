@@ -3,7 +3,7 @@
 
 #doc-template(
 title: "Calculation of the Lunar Calendar",
-date: "August 24th, 2020",
+date: "August 24, 2020",
 body: [
 
 The Gregorian calendar, which is the current international calendar, is something most people learned in primary school, and its rules are very simple. But the Lunar Calendar (Nongli) is different; every year the Spring Festival seems to change, it's never on the same day as Lichun (Beginning of Spring), yet it's always near it. Leap months are even more confusing—any month could potentially be a leap month.

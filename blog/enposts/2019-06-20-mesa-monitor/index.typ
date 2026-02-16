@@ -2,7 +2,7 @@
 #import "/template-en.typ":*
 #doc-template(
 title: "Simulating Mesa Monitor with C++",
-date: "June 20th, 2019",
+date: "June 20, 2019",
 body: [
 
 A Monitor is one of the synchronization mechanisms for concurrent programs. There are at least two types of Monitors: Mesa monitor and Hoare monitor. A Mesa monitor continues running after a `notify`, whereas a Hoare monitor performs a context switch after a `notify`, moving to the place where `wait` was called and starting execution there. Therefore, when writing a `wait`, a Mesa monitor requires this:

@@ -3,7 +3,7 @@
 
 #doc-template(
 title: "The Path of Pain",
-date: "December 6th, 2019",
+date: "December 6, 2019",
 body: [
 
 

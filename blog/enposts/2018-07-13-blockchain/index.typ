@@ -3,7 +3,7 @@
 
 #doc-template(
 title: "Why I Don't Think Blockchain is the Future",
-date: "July 13th, 2018",
+date: "July 13, 2018",
 body: [
 
 First, I must admit this title is quite cliché, but for a moment, I couldn't think of a better one. Blockchain or cryptocurrency was originally just a niche hobby. However, starting from 2016, this niche field began to surge, with various capitals pouring in, becoming the biggest trend of 2017. Countless people began to preach that this is the next internet, the future of mankind, and so on. Coupled with the myths of instant wealth created by the skyrocketing prices of cryptocurrencies, such publicity became even more inflammatory. However, as the title suggests, I firmly believe that blockchain will not be the future, and I will summarize my reasons below.

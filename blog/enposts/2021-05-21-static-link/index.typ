@@ -3,7 +3,7 @@
 
 #doc-template(
 title: "Static Linking Go and Rust",
-date: "May 21st, 2021",
+date: "May 21, 2021",
 body: [
 
 Go and Rust have a very useful feature: binary deployment. However, on Linux, the compiled binary files still depend on glibc. If the glibc versions on the development machine and the deployment machine are inconsistent, it causes trouble. Therefore, if you want to deploy binary files directly, glibc also needs to be statically linked.

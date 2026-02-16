@@ -3,7 +3,7 @@
 
 #doc-template(
 title: "Just a Food Gatherer",
-date: "April 12th, 2018",
+date: "April 12, 2018",
 body: [
 
 "Sapiens: A Brief History of Humankind" is a very interesting book. There are many popular science books about human history, "A Global History" being one example, but "Sapiens" has a very unique aspect: it focuses on telling the story of "what humans are" from a biological perspective.

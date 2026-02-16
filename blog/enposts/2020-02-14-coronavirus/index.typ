@@ -3,10 +3,10 @@
 
 #doc-template(
 title: "Coronavirus",
-date: "February 14th, 2020",
+date: "February 14, 2020",
 body: [
 
-On January 15th, reports about the novel coronavirus pneumonia epidemic were only a few words long, the infection numbers were insignificant, and the official media were full of optimism.
+On January 15, reports about the novel coronavirus pneumonia epidemic were only a few words long, the infection numbers were insignificant, and the official media were full of optimism.
 
 That day, I went home from Beijing. Leaving the dormitory, I thought of that article I read a long time ago, "Beijing Middle-aged Under the Flu." "SARS" also left me with some blurry memories. So I decided to wear a mask when passing through the railway station and also reminded my roommates. That day, there weren't many people at the railway station because the Spring Festival travel rush hadn't started yet. Wearing a mask, I seemed like an outlier in the crowd, but I didn't care.
 
@@ -14,7 +14,7 @@ However, I didn't have much foresight. I originally had half a box of 3M N95 mas
 
 Everyone knows what happened next. The news began to ferment, questioning began to rise, and after many years, I saw Bai Yansong and Academician Zhong Nanshan on TV again.
 
-On January 23rd, Wuhan was locked down.
+On January 23, Wuhan was locked down.
 
 Fortunately, I was not in Wuhan, nor in Hubei. But today, with advanced information and a high-speed rail network reaching everywhere, Wuhan's epidemic could not be detached from any Chinese person. I was no exception.
 

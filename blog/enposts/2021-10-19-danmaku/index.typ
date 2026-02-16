@@ -3,7 +3,7 @@
 
 #doc-template(
 title: "Developing a Danmaku Reader",
-date: "October 19th, 2021",
+date: "October 19, 2021",
 body: [
 
 I recently have plans to become a transparent, silent-type vTuber. To increase the entertainment effect, I created a Danmaku (bullet chat) reader. Since I didn't want to spend too much time, I chose Python for a quick solution.

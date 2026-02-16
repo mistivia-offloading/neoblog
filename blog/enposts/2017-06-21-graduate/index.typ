@@ -3,7 +3,7 @@
 
 #doc-template(
 title: "Graduation Notes",
-date: "June 21st, 2017",
+date: "June 21, 2017",
 body: [
 
 Suddenly, I just graduated like this.
@@ -24,7 +24,7 @@ The night of the 18th was my last night in the student apartment. While showerin
 
 In winter, looking towards Wudaokou from the north-facing dormitory balcony, one could see the glowing logo of the Kuaishou company. But by June, after the trees on the west side have grown, the lush foliage blocks the view. Half a year later, in early winter, the leaves will fall again, but I will no longer have the chance to look towards Wudaokou from that same spot.
 
-On the 19th, we cleared out the dormitory and everyone went their separate ways. Although I will return to this campus in a month or two, by then, many familiar faces will be missing from this campus.
+On June 19, we cleared out the dormitory and everyone went their separate ways. Although I will return to this campus in a month or two, by then, many familiar faces will be missing from this campus.
 
 And so, these four years of time passed quickly, like a fleeting white horse.
 

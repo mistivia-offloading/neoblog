@@ -3,7 +3,7 @@
 
 #doc-template(
 title: "Hangzhou Travelogue",
-date: "December 30th, 2018",
+date: "December 30, 2018",
 body: [
 
 A few days ago, I was sent by my supervisor to Hangzhou to participate in a training session. I stayed in Hangzhou for a total of three days. Excluding the two days spent on training, there was a little spare time, so this can also be seen as a short-term trip.

@@ -3,7 +3,7 @@
 
 #doc-template(
 title: "EZLive: Easily Build a Private Live Streaming Room Without a Server",
-date: "September 27th, 2025",
+date: "September 27, 2025",
 body: [
 
 If you want to start a live stream, most people choose domestic platforms like Bilibili, Douyin, and Douyu, or foreign video platforms like Twitch and YouTube.

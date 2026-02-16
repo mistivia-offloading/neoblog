@@ -3,7 +3,7 @@
 
 #doc-template(
 title: "Talking About Disordered Timelines",
-date: "September 26th, 2017",
+date: "September 26, 2017",
 body: [
 
 The biggest difference between social networks and other early internet applications like BBS is the "timeline" mechanism. Early social network timeline mechanisms were very simple: they just arranged the status updates of friends in chronological order. Today, many social networks still maintain this mechanism, such as Tencent's Qzone and WeChat Moments. This chronological timeline is simple and clear; when a user scrolls to a certain point in time, they know they have seen all the latest updates and can stop.
