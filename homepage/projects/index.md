@@ -7,3 +7,5 @@ Projects
 - [timerbot](https://github.com/mistivia/timerbot): Telgram bot in Haskell
 - [bamboo-lisp](https://github.com/mistivia/bamboo-lisp) embeddable lisp-2 interpreter in C
 - [mvvmm](https://github.com/mistivia/mvvmm): minimal viable virtual machine monitor
+- [algds](https://github.com/mistivia/mvvmm): type-safe generic data structures and algorithms for C
+- [cact](https://github.com/mistivia/cact): actor model library
