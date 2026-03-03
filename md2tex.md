@@ -1,4 +1,4 @@
-# skill.md — Markdown 转 Template-en.tex 转换指南
+# Markdown 转 Template-en.tex 转换指南
 
 ## 概述
 
