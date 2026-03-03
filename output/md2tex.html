@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title># skill.md — Markdown 转 Template-en.tex 转换指南</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style3.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<pre class="back"><a href="../">../</a></pre>
+
+<h1># skill.md — Markdown 转 Template-en.tex 转换指南</h1>
+<h2>概述</h2>
+
+<p>本文档描述如何将标准 Markdown 语法手动或自动转换为 <code>template-en.tex</code> 模板所使用的 TeX 语法。</p>
+
+<hr />
+
+<h2>文档框架转换</h2>
+
+<h3>Markdown</h3>
+
+<p>```markdown</p>
+
+<h1>文章标题</h1>
+
+<p>2000年1月1日</p>
+
+<p>正文内容……
+```</p>
+
+<h3>对应 TeX</h3>
+
+<p>```tex
+\input template.tex
+\title {文章标题}
+\date {2000\sp 年\sp 1\sp 月\sp 1\sp 日}</p>
+
+<p>正文内容……</p>
+
+<p>\bye
+```</p>
+
+<hr />
+
+<h2>语法对照表</h2>
+
+<h3>1. 章节标题</h3>
+
+<p><code>## 章节名</code> 对应 <code>\s {章节名}</code></p>
+
+<p><code>### 章节名</code> 对应 <code>\ss {章节名}</code></p>
+
+<p><code>#### 章节名</code> 对应 <code>\sss {章节名}</code></p>
+
+<p><strong>Markdown：</strong>
+```markdown</p>
+
+<h2>CPU 初始化</h2>
+
+<p>```</p>
+
+<p><strong>TeX：</strong>
+<code>tex
+\s {CPU 初始化}
+</code></p>
+
+<hr />
+
+<h3>2. 段落</h3>
+
+<p><strong>Markdown：</strong>
+```markdown
+第一段内容。</p>
+
+<p>第二段内容。
+```</p>
+
+<p><strong>TeX：</strong>
+```tex
+第一段内容。</p>
+
+<p>第二段内容。
+```</p>
+
+<hr />
+
+<h3>3. 超链接</h3>
+
+<p> <code>[文字](url)</code> 对应 <code>\href{url}{文字}</code></p>
+
+<p><strong>Markdown：</strong>
+<code>markdown
+[Firecracker](https://firecracker-microvm.github.io/)
+</code></p>
+
+<p><strong>TeX：</strong>
+<code>tex
+\href{https://firecracker-microvm.github.io/}{Firecracker}
+</code></p>
+
+<blockquote><p>⚠️ 注意：Markdown 是 <code>[文字](url)</code>，TeX 是 <code>\href{url}{文字}</code>，<strong>顺序相反</strong>。</p></blockquote>
+
+<hr />
+
+<h3>4. 行内代码</h3>
+
+<p><code>`代码`</code> 对应 <code>{\itt 代码}</code> |</p>
+
+<p><strong>Markdown：</strong>
+<code>markdown
+使用 `ioctl` 调用 `KVM_CREATE_VM` 接口。
+</code></p>
+
+<p><strong>TeX：</strong>
+<code>tex
+使用 {\itt ioctl} 调用 {\itt KVM\_CREATE\_VM} 接口。
+</code></p>
+
+<blockquote><p>⚠️ TeX 中下划线 <code>_</code> 需转义为 <code>\_</code>。</p></blockquote>
+
+<hr />
+
+<h3>5. 代码块</h3>
+
+<table>
+<thead>
+<tr>
+<th> Markdown </th>
+<th> TeX </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> 开始：<code>```语言</code> </td>
+<td> <code>\bcode</code> </td>
+</tr>
+<tr>
+<td> 结束：<code>```</code> </td>
+<td> <code>|ecode</code> </td>
+</tr>
+<tr>
+<td> 块内换段：空行 </td>
+<td> <code>|par |par</code> </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>对于代码中的<code>|</code>要转成<code>||</code></p>
+
+<p><strong>Markdown：</strong>
+<code>`markdown
+</code>c
+struct kvm_regs regs;
+ioctl(cpu_fd, KVM_GET_REGS, &amp;regs);</p>
+
+<p>regs.rip = 0x100000;
+ioctl(cpu_fd, KVM_SET_REGS, &amp;regs);
+```
+````</p>
+
+<p><strong>TeX：</strong>
+<code>tex
+\bcode
+struct kvm_regs regs;
+ioctl(cpu_fd, KVM_GET_REGS, &amp;regs);
+|par |par
+regs.rip = 0x100000;
+ioctl(cpu_fd, KVM_SET_REGS, &amp;regs);
+|ecode
+</code></p>
+
+<hr />
+
+<h3>6. 列表</h3>
+
+<p>对于无序列表</p>
+
+<table>
+<thead>
+<tr>
+<th> Markdown </th>
+<th> TeX </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> 列表开始（第一个 <code>-</code>之前） </td>
+<td> <code>\bli</code> </td>
+</tr>
+<tr>
+<td> 列表结束（最后一个条目之后） </td>
+<td> <code>\eli</code> </td>
+</tr>
+<tr>
+<td> <code>- 条目内容</code> </td>
+<td> <code>\li 条目内容</code> </td>
+</tr>
+</tbody>
+</table>
+
+
+<p><strong>Markdown：</strong>
+<code>markdown
+- `KVM_CREATE_VM`：创建虚拟机
+- `KVM_CREATE_IRQCHIP`：创建中断芯片模拟
+- `KVM_CREATE_PIT2`：创建时钟芯片模拟
+</code></p>
+
+<p><strong>TeX：</strong>
+<code>tex
+\bli
+    \li {\itt KVM\_CREATE\_VM}：创建虚拟机
+    \li {\itt KVM\_CREATE\_IRQCHIP}：创建中断芯片模拟
+    \li {\itt KVM\_CREATE\_PIT2}：创建时钟芯片模拟
+\eli
+</code></p>
+
+<p>对于有序列表：</p>
+
+<p><code>tex
+\bli
+    \item{1. } {\itt KVM\_CREATE\_VM}：创建虚拟机
+    \item{2. } {\itt KVM\_CREATE\_IRQCHIP}：创建中断芯片模拟
+    \item{3. } {\itt KVM\_CREATE\_PIT2}：创建时钟芯片模拟
+\eli
+</code></p>
+
+<hr />
+
+<h3>7. 图片</h3>
+
+<table>
+<thead>
+<tr>
+<th> Markdown </th>
+<th> TeX </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> <code>&lt;a href="文件名" target="_blank"&gt;&lt;img src="文件名" alt="alt" style="max-width:300px;max-height:300px;"&gt;&lt;/a&gt;{宽度}</code> </td>
+<td> <code>\img{文件名}{宽度比例}</code> </td>
+</tr>
+</tbody>
+</table>
+
+
+<p><strong>Markdown（约定写法）：</strong>
+<code>markdown
+![](1.jpg)
+</code></p>
+
+<p><strong>TeX：</strong>
+<code>tex
+\img{1.jpg}{0.75}
+</code></p>
+
+<hr />
+
+<h3>8. 粗体 / 斜体</h3>
+
+<blockquote><p>本模板未见 <code>\textbf</code> / <code>\textit</code> 的使用示例，建议：</p></blockquote>
+
+<table>
+<thead>
+<tr>
+<th> Markdown </th>
+<th> TeX 建议写法 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> <code>**粗体**</code> </td>
+<td> <code>{\bf 粗体}</code> </td>
+</tr>
+<tr>
+<td> <code>*斜体*</code> </td>
+<td> <code>{\it 斜体}</code> </td>
+</tr>
+</tbody>
+</table>
+
+
+<hr />
+
+<h2>特殊字符转义对照</h2>
+
+<p>在 TeX 中，以下字符具有特殊含义，从 Markdown 转换时需注意转义：</p>
+
+<table>
+<thead>
+<tr>
+<th> 字符 </th>
+<th> Markdown 中 </th>
+<th> TeX 中需写作 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> <code>_</code> </td>
+<td> 直接使用 </td>
+<td> <code>\_</code> </td>
+</tr>
+<tr>
+<td> <code>&amp;</code> </td>
+<td> 直接使用 </td>
+<td> <code>\&amp;</code> </td>
+</tr>
+<tr>
+<td> <code>%</code> </td>
+<td> 直接使用 </td>
+<td> <code>\%</code> </td>
+</tr>
+<tr>
+<td> <code>#</code> </td>
+<td> 标题标记 </td>
+<td> <code>\#</code> </td>
+</tr>
+<tr>
+<td> <code>$</code> </td>
+<td> 直接使用 </td>
+<td> <code>\$</code> </td>
+</tr>
+<tr>
+<td> <code>{</code> </td>
+<td> 直接使用 </td>
+<td> <code>\{</code> </td>
+</tr>
+<tr>
+<td> <code>}</code> </td>
+<td> 直接使用 </td>
+<td> <code>\}</code> </td>
+</tr>
+<tr>
+<td> <code>~</code> </td>
+<td> 直接使用 </td>
+<td> <code>\~{}</code> </td>
+</tr>
+<tr>
+<td> <code>^</code> </td>
+<td> 直接使用 </td>
+<td> <code>\^{}</code> </td>
+</tr>
+<tr>
+<td> <code>\</code> </td>
+<td> 直接使用 </td>
+<td> <code>\textbackslash{}</code> </td>
+</tr>
+</tbody>
+</table>
+
+
+<hr />
+
+<h2>完整转换示例</h2>
+
+<h3>输入（Markdown）</h3>
+
+<p>````markdown</p>
+
+<h1>运行虚拟 CPU</h1>
+
+<p>本节主要涉及代码中的<code>vm_run</code>函数。</p>
+
+<p>在运行虚拟 CPU 之前，需要先通过<a href="https://docs.kernel.org/virt/kvm/api.html">KVM API</a>映射一段内存：</p>
+
+<p><code>c
+mmap_size = ioctl(vm-&gt;kvm_fd, KVM_GET_VCPU_MMAP_SIZE, 0);
+run = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE,
+           MAP_SHARED, vm-&gt;cpu_fd, 0);
+</code></p>
+
+<p>CPU 退出的原因可能有：</p>
+
+<ul>
+<li>虚拟机关机</li>
+<li>虚拟机请求 IO</li>
+<li>虚拟机请求 MMIO
+````</li>
+</ul>
+
+
+<h3>输出（TeX）</h3>
+
+<p>```tex
+\s {运行虚拟 CPU}</p>
+
+<p>本节主要涉及代码中的\sp {\itt vm_run}\sp 函数。</p>
+
+<p>在运行虚拟 CPU 之前，需要先通过 \href{https://docs.kernel.org/virt/kvm/api.html}{KVM API} 映射一段内存：</p>
+
+<p>\bcode
+mmap_size = ioctl(vm->kvm_fd, KVM_GET_VCPU_MMAP_SIZE, 0);
+run = mmap(NULL, mmap_size, PROT_READ || PROT_WRITE,
+           MAP_SHARED, vm->cpu_fd, 0);
+|ecode</p>
+
+<p>CPU 退出的原因可能有：</p>
+
+<p>\bli
+    \li 虚拟机关机
+    \li 虚拟机请求 IO
+    \li 虚拟机请求 MMIO
+\eli
+```</p>
+
+<hr />
+
+<h2>转换检查清单</h2>
+
+<p>完成转换后，逐项核对：</p>
+
+<ul>
+<li class="github_checkbox"><input disabled="" type="checkbox"/> 文档头部包含 <code>\input template-en.tex</code>、<code>\title</code>、<code>\date</code></li>
+<li class="github_checkbox"><input disabled="" type="checkbox"/> 文档末尾有 <code>\bye</code></li>
+<li class="github_checkbox"><input disabled="" type="checkbox"/> 所有 <code>## 标题</code> 已转换为 <code>\s {标题}</code></li>
+<li class="github_checkbox"><input disabled="" type="checkbox"/> 所有 <code>`行内代码`</code> 已转换为 <code>{\itt 内容}</code>，且 <code>_</code> 已转义</li>
+<li class="github_checkbox"><input disabled="" type="checkbox"/> 所有代码块已替换为 <code>\bcode ... |ecode</code>，块内空行替换为 <code>|par |par</code></li>
+<li class="github_checkbox"><input disabled="" type="checkbox"/> 所有 <code>[文字](url)</code> 已转换为 <code>\href{url}{文字}</code>（注意顺序）</li>
+<li class="github_checkbox"><input disabled="" type="checkbox"/> 所有无序列表已包裹在 <code>\bli ... \eli</code> 中，条目替换为 <code>\li</code></li>
+<li class="github_checkbox"><input disabled="" type="checkbox"/> 所有图片已转换为 <code>\img{文件名}{缩放比例}</code>，缩放比例已人工确认</li>
+<li class="github_checkbox"><input disabled="" type="checkbox"/> 特殊字符（<code>_</code>、<code>&amp;</code>、<code>%</code> 等）已正确转义</li>
+<li class="github_checkbox"><input disabled="" type="checkbox"/> 中文英文之间，除非中文后面是标点，否则要插入\sp，例如 <code>这是English单词</code>变成<code>这是\sp English\sp 单词</code></li>
+</ul>
+
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script data-goatcounter="https://blog.mistivia.com:8081/count"
+        async src="https://blog.mistivia.com:8081/count.js"></script>
+</html>
+
