@@ -121,7 +121,7 @@ emailElement.innerHTML = decodedString;
 <script>
 var max = function(x, y) {{return x < y ? y : x}};
 var seth;
-seth = function() {{document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 50 + 'px'; setTimeout(seth, 1000);}}
+seth = function() {{document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}}
 setTimeout(seth, 1000);
 </script>
 </html>
