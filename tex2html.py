@@ -156,8 +156,6 @@ var decodedString = atob(base64String);
 emailElement.innerHTML = decodedString;
 </script>
 </body>
-<script data-goatcounter="https://blog.mistivia.com:8081/count"
-        async src="https://blog.mistivia.com:8081/count.js"></script>
 <script>
 var max = function(x, y) {{return x < y ? y : x}};
 var seth;

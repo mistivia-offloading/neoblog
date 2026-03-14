@@ -21,9 +21,6 @@ def getcontent(filepath):
         sys.exit(1)
 
 def get_title_from_tex(filepath):
-    """
-    读取 tex 文件的第一行，提取 %% 后的内容作为标题
-    """
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             first_line = f.readline().strip()
@@ -116,8 +113,6 @@ var decodedString = atob(base64String);
 emailElement.innerHTML = decodedString;
 </script>
 </body>
-<script data-goatcounter="https://blog.mistivia.com:8081/count"
-        async src="https://blog.mistivia.com:8081/count.js"></script>
 <script>
 var max = function(x, y) {{return x < y ? y : x}};
 var seth;

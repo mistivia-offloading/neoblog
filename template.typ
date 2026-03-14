@@ -5,7 +5,6 @@
 ) = [
     #show link: underline
     #show raw.where(block: true): block.with(
-        // fill: luma(240),
         inset: (left: 24pt, top: 0em, bottom: 0em),
         width: 100%
     )
