@@ -28,7 +28,22 @@
         paper: "a5",
         number-align: center,
     )
-    // #set page(numbering: "1")
+    #set page(numbering: "1")
+    #set page(
+        footer: context {
+            let line-width = 1.7em
+            align(center)[
+                #grid(
+                    columns: 3,
+                    gutter: 0.6em,
+                    align: horizon,
+                    line(length: line-width, stroke: 0.5pt),
+                    counter(page).display(),
+                    line(length: line-width, stroke: 0.5pt)
+                )
+            ]
+        }
+    )
     #counter(page).update(1)
     #align(center, text(27pt, font: "Source Han Serif", weight: "medium")[
         *#title*
