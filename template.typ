@@ -28,7 +28,7 @@
         paper: "a5",
         number-align: center,
     )
-    #set page(numbering: "1")
+    // #set page(numbering: "1")
     #counter(page).update(1)
     #align(center, text(27pt, font: "Source Han Serif", weight: "medium")[
         *#title*
