@@ -31,17 +31,12 @@
     #set page(numbering: "1")
     #set page(
         footer: context {
-            let line-width = 1.7em
-            align(center)[
-                #grid(
-                    columns: 3,
-                    gutter: 0.6em,
-                    align: horizon,
-                    line(length: line-width, stroke: 0.5pt),
-                    counter(page).display(),
-                    line(length: line-width, stroke: 0.5pt)
-                )
-            ]
+            set text(
+                font: "Libertinus Serif",
+                size: 0.7em,
+                weight: "bold"
+            )
+            align(center, counter(page).display())
         }
     )
     #counter(page).update(1)
