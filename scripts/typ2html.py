@@ -185,9 +185,11 @@ def build_html(svg_names: list[str], title: str, srctext: str = "") -> str:
     overflow: hidden;
 }}
 </style>
+<main>
 <p id="srctext" class="visually-hidden">
     {srctext[:500].replace('\n', '<br>').replace(' ', '&#32;')}
 </p>
+</main>
 {gen_cipherdiv(srctext[500:].replace('\n', '<br>').replace(' ', '&#32;'))}
 <div class="content">
 {pages_html}
