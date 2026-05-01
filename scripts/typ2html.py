@@ -176,7 +176,16 @@ def build_html(svg_names: list[str], title: str, srctext: str = "") -> str:
 <div class="ipadding">
 <pre class="back"><a href="../">../</a></pre>
 </div>
-<p id="srctext" style="position: absolute;width: 1px;height: 1px;padding: 0;margin: -1px;overflow: hidden;clip: rect(0, 0, 0, 0);clip-path: inset(50%);white-space: nowrap;border: 0;">
+<style>
+.visually-hidden {{
+    position: absolute;
+    left: -999px;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+}}
+</style>
+<p id="srctext" class="visually-hidden">
     {srctext[:500].replace('\n', '<br>').replace(' ', '&#32;')}
 </p>
 {gen_cipherdiv(srctext[500:].replace('\n', '<br>').replace(' ', '&#32;'))}
