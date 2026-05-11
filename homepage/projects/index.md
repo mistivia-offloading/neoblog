@@ -1,10 +1,12 @@
 Projects
 ========
 
-[ezlive](ezlive/): self-hosted serverless livestream using s3
+[EZLive](ezlive/): self-hosted serverless livestream using s3
 
-[mvvmm](mvvmm/): a small kvm-based virtual machine monitor
+[mvvmm](https://github.com/mistivia/mvvmm/): a small kvm-based virtual machine monitor
 
-[lmp](lmp/): lisp-style c++ template meta programming
+[lmp](https://github.com/mistivia/lmp/): lisp-style c++ template meta programming
 
-[basher](basher/): simple yet useful ai agent that just use `bash`
+[Basher](https://github.com/mistivia/basher/): simple yet useful ai agent that just use `bash`
+
+[BambooLisp](https://github.com/mistivia/bamboo-lisp/): embeddable Lisp-2 interpreter
