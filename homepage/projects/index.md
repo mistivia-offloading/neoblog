@@ -9,4 +9,4 @@ Projects
 
 [Basher](https://github.com/mistivia/basher/): simple yet useful ai agent that just use `bash`
 
-[BambooLisp](https://github.com/mistivia/bamboo-lisp/): embeddable Lisp-2 interpreter
+[BambooLisp](bamboo-lisp/): embeddable Lisp-2 interpreter
