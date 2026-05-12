@@ -52,7 +52,7 @@
 
 <h2>Build</h2>
 
-<p><code>bash
+<p><code>
 make
 sudo make install
 </code></p>
@@ -61,14 +61,14 @@ sudo make install
 
 <p>After building and installing, you can run the Bamboo Lisp interpreter using:</p>
 
-<p><code>bash
+<p><code>
 bamboo-lisp # To enter the REPL (if applicable)
 bamboo-lisp &lt;filename.lisp&gt; # To run a Lisp file
 </code></p>
 
 <p>You can use <code>load</code> to load a lisp script into the interpreter:</p>
 
-<p><code>lisp
+<p><code>
 (load "my-script.lisp")
 </code></p>
 
@@ -78,7 +78,7 @@ bamboo-lisp &lt;filename.lisp&gt; # To run a Lisp file
 
 <h3>1. Y Combinator</h3>
 
-<p>```lisp
+<p>```
 (defun Y (f)
   (funcall
     (lambda (g) (funcall g g))
@@ -99,7 +99,7 @@ bamboo-lisp &lt;filename.lisp&gt; # To run a Lisp file
 
 <h3>2. Macro</h3>
 
-<p><code>``lisp
+<p><code>``
 (defmacro inc (x)
  </code>(setq ,x (+ ,x 1)))</p>
 

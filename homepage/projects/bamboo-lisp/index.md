@@ -35,7 +35,7 @@ If you want a TinyScheme-like embeddable lisp intereter but in Lisp-2 flavour, B
 
 ## Build
 
-```bash
+```
 make
 sudo make install
 ```
@@ -44,14 +44,14 @@ sudo make install
 
 After building and installing, you can run the Bamboo Lisp interpreter using:
 
-```bash
+```
 bamboo-lisp # To enter the REPL (if applicable)
 bamboo-lisp <filename.lisp> # To run a Lisp file
 ```
 
 You can use `load` to load a lisp script into the interpreter:
 
-```lisp
+```
 (load "my-script.lisp")
 ```
 
@@ -61,7 +61,7 @@ See `tests/` for more examples. The tests also serve as documents.
 
 ### 1. Y Combinator
 
-```lisp
+```
 (defun Y (f)
   (funcall
     (lambda (g) (funcall g g))
@@ -82,7 +82,7 @@ See `tests/` for more examples. The tests also serve as documents.
 
 ### 2. Macro
 
-```lisp
+```
 (defmacro inc (x)
   `(setq ,x (+ ,x 1)))
 
