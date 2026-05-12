@@ -29,17 +29,15 @@ Setup a S3-compatible object storage bucket, for example, Cloudflare R2, AWS S3,
 
 Then create a config file `config`:
 
-```
-listening_addr=127.0.0.1
-listening_port=61935
-bucket=YOUR_BUCKET_NAME
-endpoint=https://your-s3.com
-s3_path=ezlive/
-access_key=YOUR_S3_ACCESS_KEY
-secret_key=YOUR_S3_SECRET_KEY
-region=auto
-key=your_live_key
-```
+    listening_addr=127.0.0.1
+    listening_port=61935
+    bucket=YOUR_BUCKET_NAME
+    endpoint=https://your-s3.com
+    s3_path=ezlive/
+    access_key=YOUR_S3_ACCESS_KEY
+    secret_key=YOUR_S3_SECRET_KEY
+    region=auto
+    key=your_live_key
 
 In the dashboard of your object storage provider, enable public read, and add the domain name of your web HLS player to CORS setting. If you don't know how to setup a web HLS player, just add `https://mistivia.github.io`.
 
@@ -77,9 +75,8 @@ Then set "Permissions" -> "Cross-origin resource sharing (CORS)" to:
     ]
 
 Start EZLive:
-```
-./ezlive
-```
+
+    ./ezlive
 
 Open OBS, streaming to `srt://127.0.0.1:61935`, with streaming key. The streaming format must be H.264 + AAC.
 
