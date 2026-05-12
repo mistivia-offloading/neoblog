@@ -10,3 +10,15 @@ Projects
 [Basher](https://github.com/mistivia/basher/): simple yet useful ai agent that just use `bash`
 
 [BambooLisp](bamboo-lisp/): embeddable Lisp-2 interpreter
+
+[typed-rpc](https://github.com/mistivia/typed-rpc): type-safe Haskell JSON-RPC 2.0 server library
+
+[flex-record](https://github.com/mistivia/flex-record): extensible Haskell records with type-level fields
+
+[accessor-hs](https://github.com/mistivia/accessor-hs): naive lens-like Haskell data accessor library
+
+[hivemind](https://github.com/mistivia/hivemind): draft simulation for *Magic: the Gathering*
+
+[raytracer](https://github.com/mistivia/raytracer): toy ray tracer from the book *Computer Graphics from Scratch*
+
+[oj](https://github.com/mistivia/oj): solutions of LeetCode, CodeWars, Advent of Code, etc.
