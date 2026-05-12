@@ -3,7 +3,7 @@ Projects
 
 [EZLive](ezlive/): self-hosted serverless livestream using s3
 
-[mvvmm](https://github.com/mistivia/mvvmm/): a small kvm-based virtual machine monitor
+[mvvmm](mvvmm/): a small kvm-based virtual machine monitor
 
 [lmp](https://github.com/mistivia/lmp/): lisp-style c++ template meta programming
 
