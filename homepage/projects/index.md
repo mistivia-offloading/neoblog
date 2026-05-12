@@ -17,7 +17,7 @@ Projects
 
 [accessor-hs](https://github.com/mistivia/accessor-hs): naive lens-like Haskell data accessor library
 
-[hivemind](https://github.com/mistivia/hivemind): draft simulation for *Magic: the Gathering*
+[hivemind](hivemind/): draft simulation for *Magic: the Gathering*
 
 [raytracer](https://github.com/mistivia/raytracer): toy ray tracer from the book *Computer Graphics from Scratch*
 

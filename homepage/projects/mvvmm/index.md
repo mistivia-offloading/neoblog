@@ -20,10 +20,8 @@ A virtual machine monitor (VMM) built upon KVM, designed for experimentation and
 
 For a quick test, follow these steps:
 
-1. Clone the repository and build the VMM:
+1. Extract tarball and build the VMM:
 
-    git clone --depth 1 https://github.com/mistivia/mvvmm
-    cd mvvmm
     make
 
 2. Prepare a Linux kernel with VirtIO‑MMIO support (see [Creating a Guest](#creating-a-guest) for details).
