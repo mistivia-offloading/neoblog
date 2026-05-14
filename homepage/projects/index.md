@@ -7,7 +7,7 @@ Projects
 
 [lmp](lmp/): lisp-style c++ template meta programming
 
-[Basher](https://github.com/mistivia/basher/): simple yet useful ai agent that just use `bash`
+[Basher](basher/): simple yet useful ai agent that just use `bash`
 
 [BambooLisp](bamboo-lisp/): embeddable Lisp-2 interpreter
 
