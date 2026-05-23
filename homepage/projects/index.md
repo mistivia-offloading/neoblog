@@ -13,7 +13,7 @@ Projects
 
 [typed-rpc](https://github.com/mistivia/typed-rpc): type-safe Haskell JSON-RPC 2.0 server library
 
-[flex-record](https://github.com/mistivia/flex-record): extensible Haskell records with type-level fields
+[flex-record](flex-record/): extensible Haskell records with type-level fields
 
 [accessor-hs](accessor-hs/): naive lens-like Haskell data accessor library
 
