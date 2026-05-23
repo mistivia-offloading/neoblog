@@ -15,7 +15,7 @@ Projects
 
 [flex-record](https://github.com/mistivia/flex-record): extensible Haskell records with type-level fields
 
-[accessor-hs](https://github.com/mistivia/accessor-hs): naive lens-like Haskell data accessor library
+[accessor-hs](accessor-hs/): naive lens-like Haskell data accessor library
 
 [hivemind](hivemind/): draft simulation for *Magic: the Gathering*
 
