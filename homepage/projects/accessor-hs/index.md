@@ -1,4 +1,5 @@
-# Accessor
+Accessor
+========
 
 Very naive lens-like library.
 
