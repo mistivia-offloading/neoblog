@@ -8,6 +8,14 @@
     <generator>Python Plain String RSS Generator</generator>
 
     <item>
+      <title>Minecraft服务器搭建</title>
+      <link>https://blog.mistivia.com/posts/2026-05-24-mcserver/</link>
+      <description>Link to the post: https://blog.mistivia.com/posts/2026-05-24-mcserver/</description>
+      <guid>https://blog.mistivia.com/posts/2026-05-24-mcserver/</guid>
+      <pubDate>Sun, 24 May 2026 00:00:00 GMT</pubDate>
+    </item>
+
+    <item>
       <title>给欧拉-拉格朗日方程加上类型注释</title>
       <link>https://blog.mistivia.com/posts/2026-03-30-functional/</link>
       <description>Link to the post: https://blog.mistivia.com/posts/2026-03-30-functional/</description>
@@ -45,14 +53,6 @@
       <description>Link to the post: https://blog.mistivia.com/posts/2025-09-27-ezlive/</description>
       <guid>https://blog.mistivia.com/posts/2025-09-27-ezlive/</guid>
       <pubDate>Sat, 27 Sep 2025 00:00:00 GMT</pubDate>
-    </item>
-
-    <item>
-      <title>东京游记</title>
-      <link>https://blog.mistivia.com/posts/2025-07-17-tokyo/</link>
-      <description>Link to the post: https://blog.mistivia.com/posts/2025-07-17-tokyo/</description>
-      <guid>https://blog.mistivia.com/posts/2025-07-17-tokyo/</guid>
-      <pubDate>Thu, 17 Jul 2025 00:00:00 GMT</pubDate>
     </item>
 
   </channel>
