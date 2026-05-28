@@ -5,7 +5,7 @@ Very naive lens-like library.
 
 # Download
 
-[accessor-hs-0.1.0.tar.gz](/blob/accessor-hs-0.1.0.tar.gz)
+[accessor-hs-0.1.0.tar.gz](https://github.com/mistivia/accessor-hs/archive/refs/tags/0.1.0.tar.gz)
 
 # Usage
 

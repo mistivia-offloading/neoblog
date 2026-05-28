@@ -7,7 +7,7 @@ The only tool Basher ever uses is Bash. Whether it’s finding, reading, or edit
 
 ## Download
 
-[basher-0.1.0.tar.gz](/blob/basher-0.1.0.tar.gz)
+[basher-0.1.0.tar.gz](https://github.com/mistivia/basher/archive/refs/tags/0.1.0.tar.gz)
 
 ## Installation
 
